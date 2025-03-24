@@ -1,8 +1,0 @@
-@baseUrl = http://demo.local
-
-### GET wifi networks
-GET {{baseUrl}}/wifi/networks/get
-
-###
-
-
