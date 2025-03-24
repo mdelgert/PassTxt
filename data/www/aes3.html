@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES Encryption & Decryption (Minimalist Dark Theme)</title>
+  <style>
+    /* General Body Styling */
+    body {
+      background-color: #181818; /* Deep black-gray background */
+      color: #e0e0e0; /* Off-white text */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* Centered Container */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #212121; /* Slightly lighter than the background */
+      border-radius: 12px; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); /* Subtle shadowing */
+    }
+
+    /* Headers */
+    h2 {
+      color: #ffffff; /* Full white for the main header */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #e0e0e0; /* Same off-white for subheaders */
+    }
+
+    /* Labels */
+    label {
+      display: block;
+      margin-top: 20px;
+      font-size: 15px;
+      color: #cfcfcf; /* Slightly lighter color for labels */
+    }
+
+    /* Inputs and Textareas */
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      background-color: #2c2c2c; /* Darker background for inputs */
+      border: 1px solid #3e3e3e; /* Subtle border for differentiation */
+      color: #ffffff; /* White text */
+      border-radius: 6px; /* Rounded edges */
+      font-size: 14px;
+      outline: none;
+      resize: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #5a5a5a; /* A lighter gray to indicate focus */
+      background-color: #333333; /* Slightly lighter on focus */
+    }
+
+    textarea[readonly] {
+      cursor: not-allowed;
+    }
+
+    /* Buttons */
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      background-color: #333333; /* Dark gray for buttons */
+      color: #ffffff; /* White text */
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #444444; /* Slightly lighter gray for hover */
+    }
+
+    button:active {
+      transform: scale(0.98); /* Subtle "press" effect */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>AES Encryption & Decryption</h2>
+    
+    <label for="textToEncrypt">Text to encrypt:</label>
+    <input type="text" id="textToEncrypt" placeholder="Enter your text here" />
+    
+    <label for="encryptionKey">Encryption Key (Password):</label>
+    <input type="text" id="encryptionKey" placeholder="Enter a password for encryption" />
+    
+    <button onclick="encrypt()">Encrypt</button>
+    <button onclick="decrypt()">Decrypt</button>
+    
+    <h3>Encrypted Text (Base64):</h3>
+    <textarea id="encryptedOutput" readonly rows="4"></textarea>
+    
+    <h3>Decrypted Text:</h3>
+    <textarea id="decryptedOutput" readonly rows="4"></textarea>
+  </div>
+
+  <script>
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    let encryptionKeyMaterial = null;
+    let iv = null;
+    let encryptedData = null;
+
+    // Helper: Derive a key from a password using PBKDF2
+    async function getKey(keyPassword) {
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(keyPassword),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+      );
+      encryptionKeyMaterial = await crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: encoder.encode("some-salt"), // Use a random, consistent salt for actual usage
+          iterations: 100000,
+          hash: "SHA-256",
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    // Encrypt function
+    async function encrypt() {
+      const textToEncrypt = document.getElementById("textToEncrypt").value;
+      const keyPassword = document.getElementById("encryptionKey").value;
+
+      if (!textToEncrypt || !keyPassword) {
+        alert("Please enter both text and a key.");
+        return;
+      }
+
+      await getKey(keyPassword); // Generate the AES key if not already done
+
+      iv = crypto.getRandomValues(new Uint8Array(12)); // Generate a random IV (12 bytes for AES-GCM)
+
+      const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        encryptionKeyMaterial,
+        encoder.encode(textToEncrypt)
+      );
+
+      encryptedData = new Uint8Array(encrypted); // Store encrypted data
+      const base64Encrypted = btoa(String.fromCharCode(...encryptedData)); // Convert to Base64 for display
+
+      document.getElementById("encryptedOutput").value = base64Encrypted;
+      document.getElementById("decryptedOutput").value = ""; // Clear previous result
+    }
+
+    // Decrypt function
+    async function decrypt() {
+      const keyPassword = document.getElementById("encryptionKey").value;
+
+      if (!encryptedData || !keyPassword) {
+        alert("Please encrypt some data first or provide the correct key.");
+        return;
+      }
+
+      await getKey(keyPassword); // Generate the AES key again with the same password
+
+      try {
+        const decrypted = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv },
+          encryptionKeyMaterial,
+          encryptedData
+        );
+
+        const decryptedText = decoder.decode(decrypted);
+        document.getElementById("decryptedOutput").value = decryptedText;
+      } catch (error) {
+        alert("Decryption failed. Key or data may be incorrect.");
+      }
+    }
+  </script>
+</body>
+</html>

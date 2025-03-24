@@ -1,0 +1,20 @@
+{
+    "buttons": [
+      {
+        "id": 1,
+        "name": "WiFi Password",
+        "category": "Passwords",
+        "action": "Type",
+        "command": "password123",
+        "notes": "Updated WiFi password for guests"
+      },
+      {
+        "id": 3,
+        "name": "Turn On LEDs",
+        "category": "LED Controls",
+        "action": "Run",
+        "command": "led on",
+        "notes": "Turns on all LED lights"
+      }
+    ]
+  }

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive File Manager</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Sidebar and editor layout */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #252526;
+            border-right: 1px solid #3c3c3c;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Toolbar styling */
+        .toolbar {
+            background: #2d2d2d;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            min-width: 120px;
+            max-width: calc(33.33% - 20px);
+        }
+
+        button:hover {
+            background: #4fc1ff;
+            color: black;
+        }
+
+        /* File list styling */
+        .file-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .file-list li {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .file-list li:hover {
+            background: #3c3c3c;
+        }
+
+        .file-list .folder {
+            font-weight: bold;
+            color: #4fc1ff;
+        }
+
+        /* Textarea editor */
+        textarea {
+            flex: 1;
+            margin: 10px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            resize: none;
+            font-family: monospace;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 50%;
+                border-right: none;
+                border-bottom: 1px solid #3c3c3c;
+            }
+
+            .toolbar {
+                gap: 5px;
+            }
+
+            button {
+                flex: 1 1 auto;
+                min-width: 80px;
+                max-width: 100%;
+            }
+
+            textarea {
+                margin: 0;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul id="fileList" class="file-list"></ul>
+        </div>
+        <div class="editor">
+            <div class="toolbar">
+                <button onclick="createFile()">New File</button>
+                <button onclick="createFolder()">New Folder</button>
+                <button onclick="deleteItem()">Delete</button>
+                <button onclick="renameItem()">Rename</button>
+                <button onclick="saveFile()">Save</button>
+            </div>
+            <textarea id="editor" placeholder="Select a file to view or edit..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        const endPoint = window.location.hostname === "localhost" ? `http://demo1.local` : "";
+        let currentPath = '/';
+        let currentFile = null;
+
+        // Fetch and display files and folders
+        async function refreshFiles() {
+            try {
+                const response = await fetch(`${endPoint}/filemanager?path=${encodeURIComponent(currentPath)}`);
+                const data = await response.json();
+
+                if (data.status !== "success") {
+                    alert("Error fetching directory contents: " + data.message);
+                    return;
+                }
+
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+
+                // Add back button
+                if (currentPath !== '/') {
+                    const backButton = document.createElement('li');
+                    backButton.textContent = '.. (Back)';
+                    backButton.onclick = goBack;
+                    fileList.appendChild(backButton);
+                }
+
+                // Display folders
+                data.data.folders.forEach(folder => {
+                    const li = document.createElement('li');
+                    li.textContent = folder;
+                    li.classList.add('folder');
+                    li.onclick = () => openFolder(folder);
+                    fileList.appendChild(li);
+                });
+
+                // Display files
+                data.data.files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.textContent = file;
+                    li.onclick = () => openFile(file);
+                    fileList.appendChild(li);
+                });
+            } catch (err) {
+                console.error("Error refreshing file list:", err);
+            }
+        }
+
+        function openFolder(folder) {
+            currentPath += `${folder}/`;
+            refreshFiles();
+        }
+
+        function goBack() {
+            currentPath = currentPath.substring(0, currentPath.lastIndexOf('/', currentPath.length - 2) + 1) || '/';
+            refreshFiles();
+        }
+
+        async function openFile(file) {
+            try {
+                const response = await fetch(`${endPoint}/file?filename=${encodeURIComponent(currentPath + file)}`);
+                const content = await response.text();
+                currentFile = file;
+                document.getElementById('editor').value = content;
+            } catch (err) {
+                console.error("Error opening file:", err);
+            }
+        }
+
+        async function saveFile() {
+            if (!currentFile) {
+                alert("No file selected.");
+                return;
+            }
+            const content = document.getElementById('editor').value;
+            try {
+                const response = await fetch(`${endPoint}/file?filename=${encodeURIComponent(currentPath + currentFile)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: content
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    alert("File saved successfully!");
+                } else {
+                    alert("Error saving file: " + result.message);
+                }
+            } catch (err) {
+                console.error("Error saving file:", err);
+            }
+        }
+
+        async function createFile() {
+            const fileName = prompt("Enter new file name:");
+            if (!fileName) return;
+            try {
+                const response = await fetch(`${endPoint}/file?filename=${encodeURIComponent(currentPath + fileName)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: ' ' // Create an empty file
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    refreshFiles();
+                } else {
+                    alert("Error creating file: " + result.message);
+                }
+            } catch (err) {
+                console.error("Error creating file:", err);
+            }
+        }
+
+        async function createFolder() {
+            const folderName = prompt("Enter new folder name:");
+            if (!folderName) return;
+            try {
+                const response = await fetch(`${endPoint}/folder?foldername=${encodeURIComponent(currentPath + folderName)}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    refreshFiles();
+                } else {
+                    alert("Error creating folder: " + result.message);
+                }
+            } catch (err) {
+                console.error("Error creating folder:", err);
+            }
+        }
+
+        async function deleteItem() {
+            const itemName = prompt("Enter file or folder name to delete:");
+            if (!itemName) return;
+            const isFolder = confirm("Is this a folder?");
+            const endpoint = isFolder ? '/folder' : '/file';
+            try {
+                const response = await fetch(`${endPoint}${endpoint}?filename=${encodeURIComponent(currentPath + itemName)}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    refreshFiles();
+                } else {
+                    alert("Error deleting item: " + result.message);
+                }
+            } catch (err) {
+                console.error("Error deleting item:", err);
+            }
+        }
+
+        async function renameItem() {
+            const oldName = prompt("Enter current name:");
+            if (!oldName) return;
+            const newName = prompt("Enter new name:");
+            if (!newName) return;
+            try {
+                const response = await fetch(`${endPoint}/rename`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ oldname: currentPath + oldName, newname: currentPath + newName })
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    refreshFiles();
+                } else {
+                    alert("Error renaming item: " + result.message);
+                }
+            } catch (err) {
+                console.error("Error renaming item:", err);
+            }
+        }
+
+        // Initial load
+        refreshFiles();
+    </script>
+</body>
+</html>

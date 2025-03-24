@@ -1,0 +1,7 @@
+@baseUrl = http://demo.local
+
+### GET wifi networks
+GET {{baseUrl}}/secure
+Authorization: Bearer test
+
+###

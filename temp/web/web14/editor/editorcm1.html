@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Themed Custom Script Editor</title>
+  <!-- CodeMirror CSS and Dark Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+  <!-- CodeMirror Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/mode/simple.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #282a36; /* Match Dracula theme */
+      color: #f8f8f2;
+    }
+    h1 {
+      color: #bd93f9; /* Dracula purple */
+    }
+    .CodeMirror {
+      border: 1px solid #44475a; /* Match Dracula theme */
+      background-color: #282a36; /* Match Dracula theme */
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dark Themed Script Editor</h1>
+  <textarea id="editor" name="editor">
+REM This is a comment
+DEFAULTDELAY 500
+DELAY 1000
+REPEAT 5
+SCRIPT FILE "example.scr"
+  </textarea>
+
+  <script>
+    // Define the custom mode using CodeMirror Simple Mode
+    CodeMirror.defineSimpleMode("custom", {
+      start: [
+        // Highlight custom commands as keywords
+        { regex: /\b(?:REM|DEFAULTDELAY|DELAY|REPEAT|SCRIPT)\b/, token: "keyword" },
+
+        // Highlight file paths or strings
+        { regex: /"(.*?)"/, token: "string" },
+
+        // Highlight numbers
+        { regex: /\b\d+\b/, token: "number" },
+
+        // Highlight comments
+        { regex: /\bREM\b.*$/, token: "comment" },
+
+        // Catch-all for plain text
+        { regex: /.+/, token: "text" }
+      ],
+      // No multi-line states needed for this mode
+      meta: {
+        lineComment: "REM"
+      }
+    });
+
+    // Initialize CodeMirror editor with the custom mode
+    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+      mode: "custom", // Use the custom mode
+      lineNumbers: true, // Add line numbers
+      theme: "dracula", // Apply the dark Dracula theme
+    });
+  </script>
+</body>
+</html>

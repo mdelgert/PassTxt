@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Device</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Center the entire page content */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;    /* horizontally center everything */
+      justify-content: center;/* vertically center everything if there's enough space */
+      min-height: 100vh;      /* optional: let flexbox stretch to full viewport height */
+    }
+
+    nav {
+      width: 100%;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #333;
+    }
+
+    main {
+      margin: 2rem auto;
+      text-align: center;
+      max-width: 600px; /* optional: limit how wide the main area goes */
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    table {
+      margin: 1rem auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem 1rem;
+    }
+
+    th {
+      background: #efefef;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/actions.html">Actions</a>
+    <a href="/settings.html">Settings</a>
+    <a href="/device.html" aria-current="page">Device</a>
+  </nav>
+  <main>
+    <h1>Device Info</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody id="device-info"></tbody>
+    </table>
+  </main>
+
+  <script>
+    // If host is localhost, assume dev mode and use device IP; otherwise use relative path
+    const BASE_URL = window.location.hostname === "localhost"
+      ? "http://192.168.50.145" // change to your device IP
+      : "";
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch(`${BASE_URL}/device/get`)
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.getElementById('device-info');
+          tableBody.innerHTML = '';
+
+          Object.entries(data).forEach(([key, value]) => {
+            const row = document.createElement('tr');
+            const keyCell = document.createElement('td');
+            keyCell.textContent = key;
+
+            const valueCell = document.createElement('td');
+            valueCell.textContent = value;
+
+            row.appendChild(keyCell);
+            row.appendChild(valueCell);
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching device info:', error);
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Settings configuration page." />
+  <title>Settings</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="settings.js" defer></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <main>
+    <form class="settings-form">
+      <!-- 
+      <div class="form-group">
+        <label for="wifi_network">Wi-Fi Network</label>
+        <input type="text" id="wifi_network" value="">
+      </div> 
+      -->
+      <div class="form-group">
+        <label for="wifi_network">Wi-Fi Network</label>
+        <select id="wifi_network_dropdown">
+          <option value="" selected>-- Select Wi-Fi Network --</option>
+        </select>
+        <input type="text" id="wifi_network" placeholder="Or enter manually">
+      </div>           
+      <div class="form-group">
+        <label for="wifi_password">Wi-Fi Password</label>
+        <input type="password" id="wifi_password" value="">
+      </div>
+      <div class="form-group">
+        <label for="device_name">Device Name</label>
+        <input type="text" id="device_name" value="">
+      </div>
+      <div class="form-group">
+        <label for="mqtt_server">MQTT Server</label>
+        <input type="text" id="mqtt_server" value="">
+      </div>
+      <div class="form-group">
+        <label for="mqtt_port">MQTT Port</label>
+        <input type="text" id="mqtt_port" value="">
+      </div>
+      <div class="form-group">
+        <label for="mqtt_username">MQTT Username</label>
+        <input type="text" id="mqtt_username" value="">
+      </div>
+      <div class="form-group">
+        <label for="mqtt_password">MQTT Password</label>
+        <input type="password" id="mqtt_password" value="">
+      </div>
+      <div class="form-group checkbox-wrapper">
+        <input type="checkbox" id="mqtt_ssl">
+        <label for="mqtt_ssl">Use Secure MQTT (SSL/TLS)</label>
+      </div>
+      <div class="form-group">
+        <label for="mqtt_topic_sub">MQTT Topic Sub</label>
+        <input type="text" id="mqtt_topic_sub" value="">
+      </div>
+      <div class="form-group">
+        <label for="mqtt_topic_pub">MQTT Topic Pub</label>
+        <input type="text" id="mqtt_topic_pub" value="">
+      </div>
+      <div class="form-group">
+        <label for="api_key">API Key</label>
+        <input type="text" id="api_key" value="">
+      </div> 
+      <button type="button" class="nav-link">Save</button>
+    </form>
+    <div id="message-box" class="message-box hidden" aria-live="polite" role="alert"></div>
+    <div id="footer-container"></div>
+  </main>
+</body>
+</html>

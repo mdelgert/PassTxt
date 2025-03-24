@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>xterm.js WebSocket Terminal Demo</title>
+    <!-- xterm.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #1e1e1e; /* Match terminal background */
+            display: flex;
+            flex-direction: column;
+        }
+        #terminal {
+            flex: 1;
+        }
+        #input-area {
+            display: flex;
+            border-top: 1px solid #333;
+            padding: 5px;
+            background-color: #1e1e1e;
+        }
+        #input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        #input:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+    <div id="input-area">
+        <input type="text" id="input" placeholder="Type your message here..." autocomplete="off" />
+    </div>
+
+    <!-- xterm.js Library -->
+    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+    <!-- xterm.js Fit Addon -->
+    <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+    <script>
+        (() => {
+            const terminalContainer = document.getElementById('terminal');
+            const input = document.getElementById('input');
+            const wsUri = "ws://demo.local:8232"; // WebSocket server URI
+            let socket;
+            let term;
+            let fitAddon;
+
+            // Initialize xterm.js Terminal with Dark Theme
+            function initTerminal() {
+                term = new Terminal({
+                    convertEol: true,
+                    cursorBlink: true,
+                    theme: {
+                        background: '#1e1e1e',
+                        foreground: '#ffffff',
+                        cursor: '#ffffff',
+                        selection: '#555555',
+                        black: '#000000',
+                        red: '#ff0000',
+                        green: '#33ff00',
+                        yellow: '#ffff00',
+                        blue: '#0066ff',
+                        magenta: '#cc00ff',
+                        cyan: '#00ffff',
+                        white: '#d0d0d0',
+                        brightBlack: '#808080',
+                        brightRed: '#ff0000',
+                        brightGreen: '#33ff00',
+                        brightYellow: '#ffff00',
+                        brightBlue: '#0066ff',
+                        brightMagenta: '#cc00ff',
+                        brightCyan: '#00ffff',
+                        brightWhite: '#ffffff'
+                    }
+                });
+
+                fitAddon = new FitAddon.FitAddon();
+                term.loadAddon(fitAddon);
+                term.open(terminalContainer);
+                fitAddon.fit();
+                term.focus();
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    fitAddon.fit();
+                });
+
+                // Optional: Display initial message
+                term.writeln("\x1b[1;32mWelcome to the xterm.js WebSocket Terminal!\x1b[0m");
+                term.writeln("Connected to \x1b[1;34mws://demo.local:8232\x1b[0m");
+                term.writeln("Type your messages below and press Enter to send.");
+                term.write("\r\n> ");
+            }
+
+            // Initialize WebSocket connection
+            function initWebSocket() {
+                socket = new WebSocket(wsUri);
+
+                socket.onopen = () => {
+                    term.writeln("\r\n\x1b[1;32m[Connected to the server]\x1b[0m");
+                    term.write("> ");
+                };
+
+                socket.onmessage = (event) => {
+                    // The server is expected to send messages with ANSI color codes
+                    term.write(`\r\n${event.data}\r\n> `);
+                };
+
+                socket.onclose = (event) => {
+                    term.writeln("\r\n\x1b[1;31m[Disconnected from the server]\x1b[0m");
+                };
+
+                socket.onerror = (error) => {
+                    term.writeln(`\r\n\x1b[1;31m[WebSocket error: ${error.message}]\x1b[0m`);
+                };
+            }
+
+            // Handle user input
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    const message = input.value.trim();
+                    if (message !== "") {
+                        if (socket.readyState === WebSocket.OPEN) {
+                            socket.send(message);
+                            // Optionally, display the sent message in the terminal
+                            term.write(`\r\n\x1b[1;33mYou:\x1b[0m ${message}\r\n> `);
+                        } else {
+                            term.writeln("\r\n\x1b[1;31m[Cannot send message. WebSocket is not open.]\x1b[0m");
+                            term.write("> ");
+                        }
+                        input.value = '';
+                    }
+                }
+            });
+
+            // Initialize everything on page load
+            window.addEventListener('load', () => {
+                initTerminal();
+                initWebSocket();
+            });
+        })();
+    </script>
+</body>
+</html>

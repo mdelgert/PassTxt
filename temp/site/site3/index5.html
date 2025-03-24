@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <!-- <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script> -->
+  <script type="module" src="/webtools2/install-button.js?module"></script>
+  <title>Web Installer</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>Web Installer</h1>
+    <p>Click the button below to install firmware.</p>
+    <select id="firmware-select" class="btn"></select>
+    <br />
+    <!-- <button id="install">Install</button> -->
+    <!-- <esp-web-install-button manifest="https://firmware.esphome.io/esp-web-tools/manifest.json"></esp-web-install-button> -->
+    <esp-web-install-button 
+      manifest=""
+      id="install-button">
+    </esp-web-install-button>
+    <!--<br /><a href="firmware/v1.0.0.json">Download</a>-->
+    <!-- <br /><a href="about.html">About</a> -->
+  </div>
+  <script type="module">
+    const GITHUB_API_URL = "https://api.github.com/repos/mdelgert/ImprovWiFiWeb/releases";
+    const firmwareSelect = document.getElementById('firmware-select');
+    const installButton = document.getElementById('install-button');
+
+    async function fetchReleases() {
+      try {
+        const response = await fetch(GITHUB_API_URL);
+        if (!response.ok) {
+          throw new Error(`GitHub API error: ${response.statusText}`);
+        }
+        const releases = await response.json();
+        populateDropdown(releases);
+      } catch (error) {
+        console.error("Failed to fetch releases:", error);
+      }
+    }
+
+    // Populate the dropdown with firmware options
+    function populateDropdown(releases) {
+      releases.forEach((release) => {
+        const tagName = release.tag_name;
+        const manifestPath = `firmware/${tagName}.json`;
+
+        // Create an option element for each release
+        const option = document.createElement('option');
+        option.value = manifestPath;
+        option.textContent = `${tagName}`;
+        firmwareSelect.appendChild(option);
+      });
+
+      // Set default manifest in install button
+      if (releases.length > 0) {
+        installButton.setAttribute('manifest', `firmware/${releases[0].tag_name}.json`);
+      }
+    }
+
+    // Event listener for dropdown change
+    firmwareSelect.addEventListener('change', (event) => {
+      const selectedManifest = event.target.value;
+      installButton.setAttribute('manifest', selectedManifest);
+    });
+
+    // Initialize dropdown on page load
+    fetchReleases();
+  </script>
+</body>
+
+</html>

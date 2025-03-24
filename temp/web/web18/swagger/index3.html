@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+
+    <!-- Swagger UI Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui.min.css">
+
+    <!--
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/build/index.min.js">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/dark.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/dark-monokai.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/dracula.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/gruvbox.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/nord-dark.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/one-dark.css">
+    <link rel="stylesheet" href="modern.common.css">
+    <link rel="stylesheet" href="modern.dark.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdelgert/ImprovWiFiWeb@main/site/css/modern.common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdelgert/ImprovWiFiWeb@main/site/css/modern.dark.css">
+    -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/gh/mdelgert/ImprovWiFiWeb@main/site/css/modern.common.css,gh/mdelgert/ImprovWiFiWeb@main/site/css/modern.dark.css">
+
+</head>
+<body>
+    <div id="swagger-ui"></div>
+
+    <!-- Swagger UI Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui-standalone-preset.js"></script>
+
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "swagger.json",
+                dom_id: "#swagger-ui",
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "StandaloneLayout",
+                deepLinking: true
+            });
+        };
+    </script>
+</body>
+</html>

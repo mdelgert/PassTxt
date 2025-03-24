@@ -1,0 +1,55 @@
+<!-- files.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive File Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/theme/material-darker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/shell/shell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/powershell/powershell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/mode/simple.min.js"></script>
+    <link rel="stylesheet" href="files.css" />
+    <style></style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="breadcrumbs" id="breadcrumbs"></div>
+            <ul id="fileList" class="file-list"></ul>
+        </div>
+        <div class="editor">
+            <span id="statusMessage"></span>
+            <!-- <textarea id="editor" placeholder="Select a file to view or edit..."></textarea> -->
+            <div class="editor-container" id="editorContainer"></div>
+            <div class="toolbar">
+                <button onclick="createFile()">New File</button>
+                <button onclick="createFolder()">New Folder</button>
+                <button onclick="deleteItem()">Delete File</button>
+                <button onclick="deleteItem(true)">Delete Folder</button>
+            </div>
+            <div class="toolbar">
+                <button onclick="renameItem()">Rename</button>
+                <button onclick="saveFile()">Save</button>
+                <button onclick="">Run</button>
+                <button onclick="">Tools</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="toolsModalOverlay" onclick="toggleToolsModal()"></div>
+    <div class="modal" id="toolsModal">
+        <h3>Tools</h3>
+        <span id="modalMessage"></span>
+        <button onclick="formatJson()">Format JSON</button>
+        <button onclick="minifyJson()">Minify JSON</button>
+        <button onclick="validateJson()">Validate JSON</button>
+    </div>
+    <script></script>
+    <script src="files.js"></script>
+</body>
+</html>

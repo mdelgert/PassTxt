@@ -1,0 +1,70 @@
+<!-- buttoneditor.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button Editor</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/buttoneditor.css" />
+  <script type="module" src="/js/global.js" defer></script>
+  <script type="module" src="/js/buttoneditor.js"></script>
+  <style></style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <main>
+  <div class="container">
+    <!-- <h1>Button Editor</h1> -->
+    <div id="filterContainer">
+      <label id="categoryFilterLabel" for="categoryFilter">Category:</label>
+      <select id="categoryFilter">
+        <option value="all">All</option>
+      </select>
+      <button onclick="openModalForAdd()">Add Button</button>
+    </div>
+    <ul id="itemList"></ul>
+  </div>
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Edit Button</h2>
+        <button onclick="closeModal()">X</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="editName" placeholder="Button Label" required>
+        <select id="editCategory">
+          <option value="General">General</option>
+          <option value="Commands">Commands</option>
+          <option value="Passwords">Passwords</option>
+          <option value="TFT">TFT</option>
+          <option value="LED">LED</option>
+          <option value="Work">Work</option>
+          <option value="Home">Home</option>
+        </select>
+        <select id="editAction">
+          <option value="Password">Password</option>
+          <option value="Command">Command</option>
+          <!-- <option value="Mqtt">Mqtt</option> -->
+        </select>
+        <input type="text" id="editCommand" placeholder="Command" required>
+        <input type="text" id="editUserName" placeholder="User Name">
+        <input type="text" id="editPassword" placeholder="Password">
+        <textarea id="editNotes" placeholder="Notes (optional)"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button onclick="saveChanges()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="footer-container"></div>
+  </main>
+  <!-- 
+  <script type="module">
+    import { BASE_URL } from './js/config.js';
+    const endPoint = BASE_URL;
+  </script> 
+  -->
+</body>
+</html>

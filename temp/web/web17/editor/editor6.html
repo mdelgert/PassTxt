@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeMirror JSON Editor</title>
+  <!-- Include CodeMirror CSS and Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+  <!-- Include CodeMirror JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <style>
+    /* General Page Styling */
+    body {
+      background-color: #2e2e2e;
+      color: #ddd;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+    }
+
+    .editor-container {
+      border: 1px solid #444;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      margin: 10px 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>CodeMirror JSON Editor</h1>
+  <div class="editor-container">
+    <textarea id="editor">{ "example": "edit me" }</textarea>
+  </div>
+  <div style="text-align: center;">
+    <button onclick="formatJSON()">Format JSON</button>
+    <button onclick="validateJSON()">Validate JSON</button>
+  </div>
+  <script>
+    // Initialize CodeMirror Editor
+    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+      mode: "application/json",       // JSON syntax mode
+      theme: "material-darker",      // Dark theme
+      lineNumbers: true,             // Show line numbers
+      tabSize: 2,                    // Tab size
+      indentWithTabs: false,         // Use spaces for indentation
+      autoCloseBrackets: true,       // Automatically close brackets
+    });
+
+    // Format JSON Function
+    function formatJSON() {
+      try {
+        const json = JSON.parse(editor.getValue());
+        editor.setValue(JSON.stringify(json, null, 2)); // Pretty-print JSON
+        alert("JSON formatted successfully!");
+      } catch (err) {
+        alert("Invalid JSON: " + err.message);
+      }
+    }
+
+    // Validate JSON Function
+    function validateJSON() {
+      try {
+        JSON.parse(editor.getValue());
+        alert("Valid JSON!");
+      } catch (err) {
+        alert("Invalid JSON: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!-- advanced.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="advanced.js" defer></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <main>
+    <!-- <h1>Advanced</h1> -->
+    <div class="textarea-container">
+      <!-- 
+      <button class="nav-link actionButton" type="button" onclick="window.open('/', '_blank')">Home</button>
+      <button class="nav-link actionButton" type="button" onclick="window.location.href='/'">Home</button> 
+      -->
+      <button class="nav-link actionButton" onclick="window.open('http://demo.local/settings/get', '_blank')">Settings</button>
+      <a href="http://demo.local/settings/get" target="_blank">Settings</a>
+      <a href="http://demo.local/wifi/networks/get" target="_blank">Networks</a>
+      <a href="http://demo.local/actions/get" target="_blank">Actions</a>
+    </div>
+    <div id="message-box" class="message-box hidden" aria-live="polite" role="alert"></div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Settings</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Settings page for managing application configurations." />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="settings.js" defer></script>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <main>
+    <div class="textarea-container">
+      <textarea id="settings-textarea" placeholder="Enter your settings here..."></textarea>
+      <button class="nav-link actionButton" id="submit-button" type="button">Submit</button>
+    </div>
+    <div id="message-box" class="message-box hidden" aria-live="polite" role="alert"></div>
+  </main>
+  <div id="footer-container"></div>
+</body>
+</html>

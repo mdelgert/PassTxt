@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+    .fade-out {
+      animation: fadeOut 0.2s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white p-6 font-sans">
+
+  <!-- Trigger Button -->
+  <button onclick="openModal()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">
+    ⚙️ Manage Categories
+  </button>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeModal()"></div>
+
+  <!-- Modal Panel -->
+  <div id="modal-panel"
+       class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+              bg-gray-800 text-white w-full max-w-md p-6 rounded-lg shadow-lg hidden z-50 fade-in">
+
+    <h2 class="text-xl font-semibold mb-4">Manage Categories</h2>
+
+    <!-- Add New Category -->
+    <div class="mb-4 flex gap-2">
+      <input type="text" id="new-category-input"
+             class="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600"
+             placeholder="New category name" />
+      <button onclick="addCategory()" class="bg-green-600 hover:bg-green-500 px-4 rounded">
+        ➕
+      </button>
+    </div>
+
+    <!-- List -->
+    <ul id="category-list" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></ul>
+
+    <!-- Footer -->
+    <div class="flex justify-end gap-2">
+      <button onclick="closeModal()" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded">
+        Close
+      </button>
+      <button onclick="loadCategories()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = 'http://demo1.local';
+    const token = 'test';
+
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalPanel = document.getElementById('modal-panel');
+    const categoryList = document.getElementById('category-list');
+    const newCategoryInput = document.getElementById('new-category-input');
+
+    function openModal() {
+      modalOverlay.classList.remove('hidden');
+      modalPanel.classList.remove('hidden');
+      modalPanel.classList.add('fade-in');
+      loadCategories();
+    }
+
+    function closeModal() {
+      modalPanel.classList.remove('fade-in');
+      modalPanel.classList.add('fade-out');
+      setTimeout(() => {
+        modalPanel.classList.add('hidden');
+        modalOverlay.classList.add('hidden');
+        modalPanel.classList.remove('fade-out');
+      }, 200);
+    }
+
+    async function loadCategories() {
+      categoryList.innerHTML = '<li class="text-gray-400">Loading...</li>';
+      try {
+        const res = await fetch(`${baseUrl}/categories`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        categoryList.innerHTML = '';
+        data.categories.forEach(cat => {
+          const li = document.createElement('li');
+          li.className = "flex items-center justify-between bg-gray-700 rounded px-3 py-2";
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = cat.name;
+          input.className = "bg-transparent border-b border-gray-500 focus:outline-none w-full mr-2";
+          input.onblur = () => updateCategory(cat.id, input.value);
+          input.onkeydown = e => {
+            if (e.key === 'Enter') input.blur();
+          };
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '🗑️';
+          delBtn.className = "text-red-400 hover:text-red-200";
+          delBtn.onclick = () => deleteCategory(cat.id, cat.name);
+
+          li.appendChild(input);
+          li.appendChild(delBtn);
+          categoryList.appendChild(li);
+        });
+
+        if (data.categories.length === 0) {
+          categoryList.innerHTML = '<li class="text-gray-400 italic">No categories found.</li>';
+        }
+
+      } catch (err) {
+        categoryList.innerHTML = '<li class="text-red-400">Failed to load categories.</li>';
+        console.error(err);
+      }
+    }
+
+    async function addCategory() {
+      const name = newCategoryInput.value.trim();
+      if (!name) return alert("Enter a name");
+
+      try {
+        const res = await fetch(`${baseUrl}/categories`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ categories: [{ name }] })
+        });
+
+        if (!res.ok) throw new Error("Add failed");
+        newCategoryInput.value = '';
+        await loadCategories();
+      } catch (err) {
+        alert("Failed to add category");
+        console.error(err);
+      }
+    }
+
+    async function updateCategory(id, name) {
+      if (!name.trim()) return alert("Category name cannot be empty");
+
+      try {
+        await fetch(`${baseUrl}/categories`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ categories: [{ id, name }] })
+        });
+      } catch (err) {
+        alert("Failed to update category");
+        console.error(err);
+      }
+    }
+
+    async function deleteCategory(id, name) {
+      if (!confirm(`Delete category "${name}"?`)) return;
+
+      try {
+        const res = await fetch(`${baseUrl}/categories?id=${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error("Delete failed");
+        await loadCategories();
+      } catch (err) {
+        alert("Failed to delete category");
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Installer</title>
+    <link rel="stylesheet" href="css/styles1.css" />
+  </head>
+  <body>
+    <div class="content">
+      <h1>Web Installer 1.0</h1>
+      <div>
+        <label for="firmware-select">Select Firmware:</label>
+        <select id="firmware-select" class="dropdown">
+          <!-- Options will be dynamically generated -->
+        </select>
+      </div>
+      <br />
+      <esp-web-install-button
+        id="install-button"
+        manifest=""
+        class="firmware-installer"
+      ></esp-web-install-button>
+      <br />
+      <a href="index4.html">New</a> 
+    </div>
+    <script type="module">
+      import 'esp-web-tools';
+
+      // GitHub API URL to fetch releases
+      const GITHUB_API_URL = "https://api.github.com/repos/mdelgert/ImprovWiFiWeb/releases";
+
+      const firmwareSelect = document.getElementById('firmware-select');
+      const installButton = document.getElementById('install-button');
+
+      // Fetch release data from GitHub
+      async function fetchReleases() {
+        try {
+          const response = await fetch(GITHUB_API_URL);
+          if (!response.ok) {
+            throw new Error(`GitHub API error: ${response.statusText}`);
+          }
+          const releases = await response.json();
+          populateDropdown(releases);
+        } catch (error) {
+          console.error("Failed to fetch releases:", error);
+        }
+      }
+
+      // Populate the dropdown with firmware options
+      function populateDropdown(releases) {
+        releases.forEach((release) => {
+          const tagName = release.tag_name;
+          const manifestPath = `firmware/${tagName}.json`;
+
+          // Create an option element for each release
+          const option = document.createElement('option');
+          option.value = manifestPath;
+          option.textContent = `${tagName}`;
+          firmwareSelect.appendChild(option);
+        });
+
+        // Set default manifest in install button
+        if (releases.length > 0) {
+          installButton.setAttribute('manifest', `firmware/${releases[0].tag_name}.json`);
+        }
+      }
+
+      // Event listener for dropdown change
+      firmwareSelect.addEventListener('change', (event) => {
+        const selectedManifest = event.target.value;
+        installButton.setAttribute('manifest', selectedManifest);
+      });
+
+      // Initialize dropdown on page load
+      fetchReleases();
+    </script>
+  </body>
+</html>

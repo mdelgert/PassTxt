@@ -1,0 +1,274 @@
+<!-- buttoneditor.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buttons</title>
+  <style>
+    /* Your existing styles remain unchanged */
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+
+    input,
+    select,
+    textarea {
+      width: calc(100% - 20px);
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      background: #222;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .modal-header,
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .modal-footer {
+      margin-top: 15px;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Buttons</h1>
+    <ul id="itemList"></ul>
+    <button onclick="openModalForAdd()">Add Button</button>
+  </div>
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Edit Button</h2>
+        <button onclick="closeModal()">X</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="editName" placeholder="Button Label" required>
+        <select id="editCategory">
+          <option value="General">General</option>
+          <option value="Commands">Commands</option>
+          <option value="Passwords">Passwords</option>
+          <option value="LED Controls">LED Controls</option>
+        </select>
+        <select id="editAction">
+          <option value="Type">Send Password</option>
+          <option value="Run">Run Command</option>
+        </select>
+        <input type="text" id="editCommand" placeholder="Command or Password" required>
+        <textarea id="editNotes" placeholder="Notes (optional)"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button onclick="saveChanges()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const endPoint = window.location.hostname === "localhost" ? "http://demo1.local" : "";
+
+    let items = [];
+    let editingItemId = null;
+
+    const fetchButtons = async () => {
+      try {
+        const response = await fetch(`${endPoint}/buttons`, { method: "GET" });
+        if (response.ok) {
+          const data = await response.json();
+          items = data.buttons || [];
+          renderList();
+        } else {
+          console.error("Failed to fetch buttons");
+        }
+      } catch (err) {
+        console.error("Error fetching buttons:", err);
+      }
+    };
+
+    const renderList = () => {
+      const itemList = document.getElementById("itemList");
+      itemList.innerHTML = "";
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+      <span>${item.name}</span>
+      <div class="actions">
+        <button onclick="openModal(${item.id})">Edit</button>
+        <button onclick="deleteItem(${item.id})">Delete</button>
+      </div>
+    `;
+        itemList.appendChild(li);
+      });
+    };
+
+    const openModal = (id) => {
+      editingItemId = id;
+      const item = items.find((i) => i.id === id);
+      document.getElementById("editName").value = item.name;
+      document.getElementById("editCategory").value = item.category;
+      document.getElementById("editAction").value = item.action;
+      document.getElementById("editCommand").value = item.command;
+      document.getElementById("editNotes").value = item.notes || "";
+      document.getElementById("modalTitle").textContent = "Edit Button";
+      document.getElementById("editModal").style.display = "flex";
+    };
+
+    const openModalForAdd = () => {
+      editingItemId = null;
+      document.getElementById("editName").value = "";
+      document.getElementById("editCategory").value = "General";
+      document.getElementById("editAction").value = "Type";
+      document.getElementById("editCommand").value = "";
+      document.getElementById("editNotes").value = "";
+      document.getElementById("modalTitle").textContent = "Add New Button";
+      document.getElementById("editModal").style.display = "flex";
+    };
+
+    const closeModal = () => {
+      document.getElementById("editModal").style.display = "none";
+    };
+
+    const saveChanges = async () => {
+      const name = document.getElementById("editName").value;
+      const category = document.getElementById("editCategory").value;
+      const action = document.getElementById("editAction").value;
+      const command = document.getElementById("editCommand").value;
+      const notes = document.getElementById("editNotes").value;
+      if (!name || !command) return;
+
+      const button = { id: editingItemId || Date.now(), name, category, action, command, notes };
+
+      try {
+        const response = await fetch(`${endPoint}/buttons`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ buttons: [button] }),
+        });
+
+        if (response.ok) {
+          await fetchButtons(); // Refresh the list
+          closeModal();
+        } else {
+          console.error("Failed to save button");
+        }
+      } catch (err) {
+        console.error("Error saving button:", err);
+      }
+    };
+
+    const deleteItem = async (id) => {
+      try {
+        const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+        if (response.ok) {
+          await fetchButtons(); // Refresh the list
+        } else {
+          console.error("Failed to delete button");
+        }
+      } catch (err) {
+        console.error("Error deleting button:", err);
+      }
+    };
+
+    fetchButtons();
+  </script>
+</body>
+</html>

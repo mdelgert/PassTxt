@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES Encryption & Decryption (ChatGPT-style Dark Theme)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <link rel="stylesheet" href="/css/aes2.css" />
+  <style></style>
+</head>
+<body>
+  <div class="container">
+    <h2>AES Encryption & Decryption</h2>
+    
+    <label for="textToEncrypt">Text to encrypt:</label>
+    <input type="text" id="textToEncrypt" placeholder="Enter text to encrypt" />
+    
+    <label for="encryptionKey">Encryption Key (Password):</label>
+    <input type="text" id="encryptionKey" placeholder="Enter key for encryption" />
+    
+    <button onclick="encrypt()">Encrypt</button>
+    <button onclick="decrypt()">Decrypt</button>
+    
+    <h3>Encrypted Text (Base64):</h3>
+    <textarea id="encryptedOutput" rows="4" readonly></textarea>
+    
+    <h3>Decrypted Text:</h3>
+    <textarea id="decryptedOutput" rows="4" readonly></textarea>
+  </div>
+
+  <script>
+    // Encrypt function using CryptoJS
+    function encrypt() {
+      const textToEncrypt = document.getElementById('textToEncrypt').value;
+      const encryptionKey = document.getElementById('encryptionKey').value;
+      if (!textToEncrypt || !encryptionKey) {
+        alert("Please enter both text and a key.");
+        return;
+      }
+      const encrypted = CryptoJS.AES.encrypt(textToEncrypt, encryptionKey).toString();
+      document.getElementById('encryptedOutput').value = encrypted;
+      document.getElementById('decryptedOutput').value = ''; // Clear previous result
+    }
+    
+    // Decrypt function using CryptoJS
+    function decrypt() {
+      const encryptedText = document.getElementById('encryptedOutput').value;
+      const encryptionKey = document.getElementById('encryptionKey').value;
+      if (!encryptedText || !encryptionKey) {
+        alert("Please enter both encrypted text and the encryption key.");
+        return;
+      }
+      try {
+        const decrypted = CryptoJS.AES.decrypt(encryptedText, encryptionKey).toString(CryptoJS.enc.Utf8);
+        document.getElementById('decryptedOutput').value = decrypted;
+      } catch (error) {
+        alert("Decryption failed: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock File Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .sidebar {
+            width: 250px;
+            background: #252526;
+            border-right: 1px solid #3c3c3c;
+            overflow-y: auto;
+        }
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .toolbar {
+            background: #2d2d2d;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+        .file-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .file-list li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .file-list li:hover {
+            background: #3c3c3c;
+        }
+        .file-list .folder {
+            font-weight: bold;
+            color: #4fc1ff;
+        }
+        textarea {
+            flex: 1;
+            margin: 10px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            resize: none;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <ul id="fileList" class="file-list"></ul>
+    </div>
+    <div class="editor">
+        <div class="toolbar">
+            <button onclick="createFile()">New File</button>
+            <button onclick="createFolder()">New Folder</button>
+            <button onclick="deleteItem()">Delete</button>
+            <button onclick="renameItem()">Rename</button>
+            <button onclick="saveFile()">Save</button>
+        </div>
+        <textarea id="editor" placeholder="Select a file to view or edit..."></textarea>
+    </div>
+
+    <script>
+        let currentPath = '/';
+        let currentFile = null;
+
+        const mockData = {
+            '/': {
+                files: ['file1.txt', 'file2.txt'],
+                folders: ['folder1', 'folder2']
+            },
+            '/folder1/': {
+                files: ['nestedFile.txt'],
+                folders: []
+            },
+            '/folder2/': {
+                files: [],
+                folders: []
+            }
+        };
+
+        function refreshFiles() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            // Add back button
+            if (currentPath !== '/') {
+                const backButton = document.createElement('li');
+                backButton.textContent = '.. (Back)';
+                backButton.onclick = goBack;
+                fileList.appendChild(backButton);
+            }
+
+            // Add folders
+            mockData[currentPath]?.folders.forEach(folder => {
+                const li = document.createElement('li');
+                li.textContent = folder;
+                li.classList.add('folder');
+                li.onclick = () => openFolder(folder);
+                fileList.appendChild(li);
+            });
+
+            // Add files
+            mockData[currentPath]?.files.forEach(file => {
+                const li = document.createElement('li');
+                li.textContent = file;
+                li.onclick = () => openFile(file);
+                fileList.appendChild(li);
+            });
+        }
+
+        function openFolder(folder) {
+            currentPath = `${currentPath}${folder}/`;
+            refreshFiles();
+        }
+
+        function goBack() {
+            currentPath = currentPath.substring(0, currentPath.lastIndexOf('/', currentPath.length - 2) + 1) || '/';
+            refreshFiles();
+        }
+
+        function openFile(file) {
+            currentFile = file;
+            document.getElementById('editor').value = `Content of ${currentPath}${file}`;
+        }
+
+        function saveFile() {
+            if (!currentFile) {
+                alert('No file selected.');
+                return;
+            }
+            alert(`Saving ${currentPath}${currentFile}...`);
+        }
+
+        function createFile() {
+            const fileName = prompt('Enter new file name:');
+            if (!fileName) return;
+            mockData[currentPath].files.push(fileName);
+            refreshFiles();
+        }
+
+        function createFolder() {
+            const folderName = prompt('Enter new folder name:');
+            if (!folderName) return;
+            mockData[currentPath].folders.push(folderName);
+            mockData[`${currentPath}${folderName}/`] = { files: [], folders: [] };
+            refreshFiles();
+        }
+
+        function deleteItem() {
+            const itemName = prompt('Enter file or folder name to delete:');
+            if (!itemName) return;
+            mockData[currentPath].files = mockData[currentPath].files.filter(file => file !== itemName);
+            mockData[currentPath].folders = mockData[currentPath].folders.filter(folder => folder !== itemName);
+            delete mockData[`${currentPath}${itemName}/`];
+            refreshFiles();
+        }
+
+        function renameItem() {
+            const oldName = prompt('Enter current file or folder name:');
+            if (!oldName) return;
+            const newName = prompt('Enter new name:');
+            if (!newName) return;
+
+            if (mockData[currentPath].files.includes(oldName)) {
+                const index = mockData[currentPath].files.indexOf(oldName);
+                mockData[currentPath].files[index] = newName;
+            } else if (mockData[currentPath].folders.includes(oldName)) {
+                const index = mockData[currentPath].folders.indexOf(oldName);
+                mockData[currentPath].folders[index] = newName;
+                mockData[`${currentPath}${newName}/`] = mockData[`${currentPath}${oldName}/`];
+                delete mockData[`${currentPath}${oldName}/`];
+            }
+
+            refreshFiles();
+        }
+
+        refreshFiles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+/* Base styles */
+body {
+  font-family: Verdana, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #222; /* Dark background */
+  color: #fff; /* White text */
+  /* text-align: center; */
+  line-height: 1.6;
+}
+
+/* Content container */
+.content {
+  max-width: 600px;
+  margin: 10% auto;
+  text-align: center;
+}
+
+/* Headings */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5em;
+  color: #fff;
+}
+
+/* Paragraph */
+p {
+  font-size: 1rem;
+  margin: 1em 0;
+  color: #ddd;
+}
+
+/* Link styles */
+a {
+  color: #9ab0c9; /* Muted blue */
+  text-decoration: none;
+}
+
+a:hover {
+  color: #b5c6e0; /* Brighter blue on hover */
+}
+
+/* ESP Web Install Button */
+esp-web-install-button {
+  display: inline-block;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff; /* White text */
+  background-color: #222; /* Gray button */
+  border: none;
+  border-radius: 25px; /* Rounded button edges */
+  cursor: pointer;
+  box-shadow: none; /* Remove any shadow */
+}
+
+esp-web-install-button:hover {
+  background-color: #222; /* Slightly lighter gray on hover */
+}
+
+/* Override shadow DOM styles using variables */
+:root {
+  --esp-tools-button-color: #555; /* Gray button background */
+  --esp-tools-button-text-color: #fff; /* White button text */
+  --esp-tools-button-border-radius: 25px; /* Rounded button */
+}

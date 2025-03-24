@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        input {
+            width: 95%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #6200ea;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+        }
+
+        .message {
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" value="admin">
+        <input type="password" id="password" placeholder="Password" value="pass">
+        <button onclick="login()">Login</button>
+        <button onclick="logout()">Logout</button>
+        <p class="message" id="message"></p>
+    </div>
+
+    <script>
+        
+        function logout() {
+            fetch("/secure/secure.html", {
+                method: "GET",
+                headers: {
+                    "Authorization": "Basic " + btoa("invalid:credentials")
+                }
+            }).then(() => {
+                window.location.href = "/login.html";
+            });
+        }
+
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const messageElement = document.getElementById("message");
+
+            if (!username || !password) {
+                messageElement.textContent = "Please enter both username and password.";
+                return;
+            }
+
+            // Encode credentials in Base64 (Basic Auth format)
+            const authHeader = "Basic " + btoa(username + ":" + password);
+
+            try {
+                const response = await fetch("/secure/secure.html", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": authHeader
+                    }
+                });
+
+                if (response.status === 200) {
+                    messageElement.style.color = "green";
+                    messageElement.textContent = "Login successful!";
+                    setTimeout(() => {
+                        window.location.href = "/secure/secure.html";
+                    }, 1000);
+                } else {
+                    messageElement.style.color = "red";
+                    messageElement.textContent = "Invalid credentials.";
+                }
+            } catch (error) {
+                messageElement.style.color = "red";
+                messageElement.textContent = "An error occurred. Please try again.";
+                console.error("Login error:", error);
+            }
+        }
+    </script>
+</body>
+
+</html>

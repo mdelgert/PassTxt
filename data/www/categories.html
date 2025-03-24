@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6 font-sans">
+  <div class="max-w-sm mx-auto space-y-4">
+    <label for="category" class="block text-sm font-medium text-gray-300">Category</label>
+    <select id="category" class="w-full bg-gray-800 text-white border border-gray-600 rounded px-3 py-2">
+      <option disabled selected>Loading categories...</option>
+    </select>
+
+    <!-- Add New Category Input -->
+    <div id="new-category-box" class="hidden space-y-2">
+      <input type="text" id="new-category-name" placeholder="New category name"
+        class="w-full bg-gray-800 text-white border border-gray-600 rounded px-3 py-2" />
+      <button onclick="saveCategory()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        Save
+      </button>
+    </div>
+
+    <button onclick="window.location = '/categories-manage1.html'"
+      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+      Manage1
+    </button>
+
+    <button onclick="window.location = '/categories-manage2.html'"
+      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+      Manage2
+    </button>
+
+    <button onclick="window.location = '/categories-manage3.html'"
+      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+      Manage3
+    </button>
+    
+  </div>
+
+  <script>
+    const baseUrl = 'http://demo1.local';
+    const token = 'test';
+
+    const categorySelect = document.getElementById('category');
+    const newCategoryBox = document.getElementById('new-category-box');
+
+    async function loadCategories() {
+      try {
+        const res = await fetch(`${baseUrl}/categories`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        // Clear existing options
+        categorySelect.innerHTML = '';
+
+        // Add fetched categories
+        data.categories.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          categorySelect.appendChild(opt);
+        });
+
+        // Add divider and "Add new..." option
+        const divider = document.createElement('option');
+        divider.disabled = true;
+        divider.textContent = '────────────';
+        categorySelect.appendChild(divider);
+
+        const addNew = document.createElement('option');
+        addNew.value = 'add-new';
+        addNew.textContent = '➕ Add new category…';
+        categorySelect.appendChild(addNew);
+
+        categorySelect.addEventListener('change', () => {
+          newCategoryBox.classList.toggle('hidden', categorySelect.value !== 'add-new');
+        });
+
+      } catch (err) {
+        categorySelect.innerHTML = '<option>Error loading categories</option>';
+        console.error('Failed to load categories:', err);
+      }
+    }
+
+    async function saveCategory() {
+      const name = document.getElementById('new-category-name').value.trim();
+      if (!name) return alert('Enter a category name');
+
+      try {
+        const res = await fetch(`${baseUrl}/categories`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ categories: [{ name }] })
+        });
+
+        const data = await res.json();
+        const newCat = data.categories?.[0];
+        if (!newCat) throw new Error('No category returned');
+
+        // Add new option and select it
+        // const opt = document.createElement('option');
+        // opt.value = newCat.id;
+        // opt.textContent = newCat.name;
+        // categorySelect.insertBefore(opt, categorySelect.lastChild.previousSibling);
+        // categorySelect.value = newCat.id;
+        
+        await loadCategories(); // Refresh full list after adding
+        categorySelect.value = newCat.id;
+
+        newCategoryBox.classList.add('hidden');
+        document.getElementById('new-category-name').value = '';
+        
+      } catch (err) {
+        alert('Failed to save category');
+        console.error(err);
+      }
+    }
+
+    loadCategories();
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+
+{
+    "status": "success",
+    "message": "GET /device/wifi/networks",
+    "data": {
+      "networks": [
+        {
+          "ssid": "test1",
+          "rssi": -47,
+          "encryptionType": 3,
+          "isHidden": false
+        },
+        {
+          "ssid": "test2",
+          "rssi": -48,
+          "encryptionType": 0,
+          "isHidden": false
+        }
+      ]
+    }
+  }

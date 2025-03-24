@@ -1,0 +1,43 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "ESP32 API",
+      "version": "1.0.0",
+      "description": "API documentation for ESP32 endpoints"
+    },
+    "servers": [
+      { "url": "http://demo1.local", "description": "Local ESP32 server" }
+    ],
+    "paths": {
+      "/device/reboot": {
+        "get": {
+          "summary": "Reboots the ESP32 device",
+          "responses": {
+            "200": { "description": "Device rebooting..." }
+          }
+        }
+      },
+      "/device/info": {
+        "get": {
+          "summary": "Retrieve device settings",
+          "responses": {
+            "200": {
+              "description": "Returns the current settings",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "device": { "type": "object" },
+                      "wifi": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

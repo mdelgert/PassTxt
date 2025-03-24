@@ -1,0 +1,276 @@
+/* styles.css */
+:root {
+  --background-color: #121212;
+  --nav-bg: #222;
+  --text-color: #fff;
+  --button-bg: #333;
+  --button-border: #444;
+  --button-hover-bg: #555;
+  --table-border: #ddd;
+  --success-bg: #28a745;
+  --error-bg: #dc3545;
+  --message-box-bg: #4caf50;
+  --base-font-size: 16px;
+  --max-width: 75rem;
+}
+
+html {
+  font-size: var(--base-font-size);
+  /* 1rem = 16px */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main {
+  text-align: center;
+  width: 80%;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  /* 24px */
+}
+
+/*
+#navbar-container {
+  width: 100%;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  background-color: var(--nav-bg);
+  padding: 0.625rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-link {
+  display: inline-block;
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 0.625rem 3.75rem;
+  border: 1px solid var(--button-border);
+  border-radius: 0.3125rem;
+  margin: 0 0.1875rem;
+  text-align: center;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background-color: var(--button-hover-bg);
+}
+
+.nav-link[aria-current="page"] {
+  background-color: var(--button-hover-bg);
+  color: #fff;
+  cursor: default;
+}
+*/
+
+#navbar-container {
+  width: 100%;
+}
+
+/* General Navbar Styling */
+.navbar {
+  display: flex;
+  flex-wrap: wrap; /* Allow links to wrap onto the next line on small screens */
+  justify-content: center;
+  background-color: var(--nav-bg);
+  padding: 0.625rem; /* 10px */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-link {
+  display: inline-block;
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 0.625rem 1.5rem; /* Reduce padding for smaller screens */
+  margin: 5px; /* Add space between links */
+  border: 1px solid var(--button-border);
+  border-radius: 0.3125rem; /* 5px */
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background-color: var(--button-hover-bg);
+}
+
+/* Responsive Navbar for Smaller Screens */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column; /* Stack links vertically */
+    align-items: center; /* Center-align the links */
+  }
+
+  .nav-link {
+    width: 100%; /* Make links stretch to fit the container */
+    text-align: center; /* Center-align the text inside the link */
+    padding: 0.75rem; /* Slightly larger padding for readability */
+  }
+}
+
+
+.actionButton {
+  width: 100%;
+  padding: 0.725rem 3.75rem;
+  max-width: var(--max-width);
+  text-align: center;
+}
+
+table {
+  margin: 0.625rem auto;
+  /* 10px */
+  border-collapse: collapse;
+  width: 100%;
+  max-width: var(--max-width);
+}
+
+th,
+td {
+  border: 1px solid var(--table-border);
+  padding: 0.625rem;
+  /* 10px */
+  text-align: left;
+}
+
+th {
+  background: var(--button-bg);
+}
+
+.message-box {
+  position: fixed;
+  bottom: 0;
+  /* top: 0; */
+  left: 0;
+  width: 100%;
+  padding: 1.25rem;
+  text-align: center;
+  font-weight: bold;
+  color: var(--text-color);
+  background-color: #4caf50;
+}
+
+.hidden {
+  display: none;
+}
+
+.message-box.show {
+  display: block;
+}
+
+.message-box.success {
+  background-color: var(--success-bg);
+}
+
+.message-box.error {
+  background-color: var(--error-bg);
+}
+
+.textarea-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.625rem;
+}
+
+textarea {
+  width: 100%;
+  max-width: var(--max-width);
+  height: 70vh;
+  max-height: 80vh;
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: 1px solid var(--button-border);
+  padding: 1rem;
+  font-size: 1rem;
+  resize: none;
+  border-radius: 0.3125rem;
+  box-sizing: border-box;
+  margin-bottom: 0.625rem;
+  /* Space between textarea and button */
+}
+
+/* Footer Styles */
+#footer-container {
+  width: 100%;
+}
+
+/* Footer styling */
+.footer {
+  bottom: 0;
+  width: 100%;
+  /* background-color: var(--nav-bg); */
+  color: var(--text-color);
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.footer-link {
+  color: var(--text-color);
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Form Styling */
+.settings-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.625rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Increased spacing for better readability */
+  width: 100%; /* Form group takes full width */
+  max-width: 500px; /* Optional: Limit the maximum width of the form */
+}
+
+label {
+  font-size: 1.2rem; /* Slightly larger labels for better readability */
+  text-align: left;
+  width: 100%;
+}
+
+input {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 15px; /* Increased padding for a larger appearance */
+  font-size: 1.1rem; /* Slightly larger font size */
+  width: 100%; /* Input spans the full width of the form group */
+  box-sizing: border-box; /* Ensure padding does not overflow */
+}
+
+input:focus {
+  outline: none;
+  border-color: #555;
+}
+

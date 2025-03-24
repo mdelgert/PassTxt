@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager and Editor</title>
+    <link rel="stylesheet" href="files.css" />
+    <script type="module" src="file.js" defer></script>
+    <style></style>
+</head>
+<body>
+    <header>File Manager and Editor</header>
+    <div class="container">
+        <div class="sidebar">
+            <ul id="fileList"></ul>
+        </div>
+        <div class="editor">
+            <div class="toolbar">
+                <button onclick="saveFile()">Save</button>
+                <button onclick="newFile()">New File</button>
+                <button onclick="createFolder()">New Folder</button>
+                <button onclick="deleteItem()">Delete</button>
+                <button onclick="renameItem()">Rename</button>
+            </div>
+            <div class="editor-container">
+                <textarea id="editor" placeholder="Select a file to edit..."></textarea>
+            </div>
+        </div>
+    </div>
+    <script></script>
+    <script src="files.js"></script>
+</body>
+</html>

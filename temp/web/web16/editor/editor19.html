@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive File Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/theme/material-darker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2e2e2e;
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #444;
+      padding: 10px;
+      font-size: 20px;
+    }
+
+    #statusMessage {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .editor-container {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 10px;
+      background-color: #333;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    .toolbar button {
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background-color: #444;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .toolbar input {
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .toolbar button:hover {
+      background-color: #555;
+    }
+
+    .file-list-container {
+      height: 200px;
+      background-color: #1e1e1e;
+      overflow-y: auto;
+      border-top: 1px solid #444;
+    }
+
+    .file-list-container ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .file-list-container li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #444;
+    }
+
+    .file-list-container li:hover {
+      background-color: #333;
+    }
+
+    .file-list-container button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .file-list-container button:hover {
+      background-color: #555;
+    }
+
+    .CodeMirror {
+      height: 100%;
+      border: 1px solid #444;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #333;
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 300px;
+    }
+
+    .modal.active {
+      display: block;
+    }
+
+    .modal button {
+      background-color: #444;
+      color: white;
+      border: 1px solid #555;
+      padding: 8px 15px;
+      margin-top: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .modal button:hover {
+      background-color: #555;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .modal-overlay.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <span>Editor</span>
+    <span id="statusMessage">Ready</span>
+  </header>
+  <div class="container">
+    <div class="editor-container" id="editorContainer"></div>
+    <div class="toolbar">
+      <input type="text" id="fileSearch" placeholder="Search files..." oninput="filterFiles()">
+      <button onclick="saveFile()">Save</button>
+      <button onclick="newFile()">New</button>
+      <button onclick="refreshFiles()">Refresh</button>
+      <button onclick="toggleModal()">Tools</button>
+      <select id="fontSizeSelector" onchange="changeFontSize()">
+        <option value="12px">12px</option>
+        <option value="14px" selected>14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+      </select>
+    </div>
+    <div class="file-list-container">
+      <ul id="fileList"></ul>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="toggleModal()"></div>
+  <div class="modal" id="modal">
+    <h3>Tools</h3>
+    <button onclick="formatJson()">Format JSON</button>
+    <button onclick="minifyJson()">Minify JSON</button>
+    <button onclick="validateJson()">Validate JSON</button>
+  </div>
+
+  <script>
+    let editor = CodeMirror(document.getElementById("editorContainer"), {
+      mode: "text/plain",
+      theme: "material-darker",
+      lineNumbers: true,
+      tabSize: 2,
+      indentWithTabs: false
+    });
+
+    function toggleModal() {
+      document.getElementById("modal").classList.toggle("active");
+      document.getElementById("modalOverlay").classList.toggle("active");
+    }
+
+    function formatJson() {
+      const content = editor.getValue();
+      try {
+        const formatted = JSON.stringify(JSON.parse(content), null, 2);
+        editor.setValue(formatted);
+        updateStatus("JSON formatted successfully.");
+      } catch {
+        updateStatus("Invalid JSON. Unable to format.");
+      }
+      toggleModal();
+    }
+
+    function minifyJson() {
+      const content = editor.getValue();
+      try {
+        const minified = JSON.stringify(JSON.parse(content));
+        editor.setValue(minified);
+        updateStatus("JSON minified successfully.");
+      } catch {
+        updateStatus("Invalid JSON. Unable to minify.");
+      }
+      toggleModal();
+    }
+
+    function validateJson() {
+      const content = editor.getValue();
+      try {
+        JSON.parse(content);
+        updateStatus("JSON is valid.");
+      } catch {
+        updateStatus("Invalid JSON.");
+      }
+      toggleModal();
+    }
+
+    function updateStatus(message) {
+      document.getElementById("statusMessage").textContent = message;
+    }
+  </script>
+</body>
+
+</html>

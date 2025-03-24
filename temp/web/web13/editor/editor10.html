@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeMirror Font Size Example</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <style>
+    body {
+      background-color: #2e2e2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .editor-container {
+      border: 1px solid #444;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    /* Set the font size for CodeMirror */
+    .CodeMirror {
+      font-size: 16px; /* Adjust font size here */
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-container" id="editorContainer"></div>
+  <div class="toolbar">
+    <button onclick="setFontSize(12)">Small</button>
+    <button onclick="setFontSize(16)">Medium</button>
+    <button onclick="setFontSize(20)">Large</button>
+  </div>
+  <script>
+    const editor = CodeMirror(document.getElementById("editorContainer"), {
+      mode: "application/json",
+      theme: "material-darker",
+      lineNumbers: true,
+      tabSize: 2,
+      indentWithTabs: false,
+    });
+
+    // Function to dynamically change the font size
+    function setFontSize(size) {
+      document.querySelector('.CodeMirror').style.fontSize = `${size}px`;
+      editor.refresh(); // Refresh CodeMirror to apply the change
+    }
+  </script>
+</body>
+</html>

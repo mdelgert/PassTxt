@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microcontroller File Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #2e2e2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .file-list {
+      width: 30%;
+      background: #1e1e1e;
+      border-right: 1px solid #444;
+      overflow-y: auto;
+    }
+    .file-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .file-list li {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #444;
+    }
+    .file-list li:hover {
+      background: #333;
+    }
+    .editor {
+      flex: 1;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .editor-container {
+      flex: 1;
+      border: 1px solid #444;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 8px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Microcontroller File Editor</h1>
+  <div class="container">
+    <!-- File List -->
+    <div class="file-list">
+      <h3 style="text-align: center;">Files</h3>
+      <ul id="fileList"></ul>
+      <div style="text-align: center; padding: 10px;">
+        <button onclick="uploadFile()">Upload File</button>
+        <button onclick="newFile()">New File</button>
+        <button onclick="refreshFiles()">Refresh</button>
+      </div>
+    </div>
+    <!-- Editor -->
+    <div class="editor">
+      <div id="editorContainer" class="editor-container"></div>
+      <div style="text-align: right;">
+        <button onclick="saveFile()">Save</button>
+        <button onclick="closeEditor()">Close</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let editor = CodeMirror(document.getElementById("editorContainer"), {
+      mode: "text/plain",
+      theme: "material-darker",
+      lineNumbers: true,
+      tabSize: 2,
+    });
+    let currentFile = null;
+
+    // Mock API: Fetch files from LittleFS
+    function fetchFiles() {
+      return [
+        "file1.json",
+        "config.txt",
+        "cert.pem",
+      ]; // Replace this with an API call to your microcontroller
+    }
+
+    // Populate File List
+    function refreshFiles() {
+      const fileList = document.getElementById("fileList");
+      fileList.innerHTML = "";
+      const files = fetchFiles();
+      files.forEach((file) => {
+        const li = document.createElement("li");
+        li.textContent = file;
+        li.onclick = () => openFile(file);
+        fileList.appendChild(li);
+      });
+    }
+
+    // Open File
+    function openFile(file) {
+      currentFile = file;
+      // Mock API call to get file content
+      const fileContent = "This is the content of " + file; // Replace with actual API call
+      editor.setValue(fileContent);
+      editor.setOption("mode", file.endsWith(".json") ? "application/json" : "text/plain");
+    }
+
+    // Save File
+    function saveFile() {
+      if (!currentFile) return alert("No file is open!");
+      const content = editor.getValue();
+      // Mock API call to save file content
+      console.log(`Saving ${currentFile} with content:\n${content}`); // Replace with actual API call
+      alert(`File ${currentFile} saved!`);
+    }
+
+    // Close Editor
+    function closeEditor() {
+      currentFile = null;
+      editor.setValue("");
+    }
+
+    // New File
+    function newFile() {
+      currentFile = prompt("Enter new file name:");
+      if (currentFile) {
+        editor.setValue("");
+        alert(`New file ${currentFile} created!`);
+      }
+    }
+
+    // Upload File
+    function uploadFile() {
+      alert("Upload file functionality to be implemented.");
+    }
+
+    // Initialize File List
+    refreshFiles();
+  </script>
+</body>
+</html>

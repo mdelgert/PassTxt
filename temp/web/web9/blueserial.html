@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluetooth Web Serial</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #00bcd4;
+        }
+
+        button {
+            background-color: #1e88e5;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        #output {
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #555;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: #222;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bluetooth Web Serial</h1>
+    <button id="connect">Connect to Device</button>
+    <div>
+        <input type="text" id="message" placeholder="Type a message...">
+        <button id="send">Send</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        let bleDevice = null;
+        let bleCharacteristic = null;
+
+        const output = document.getElementById("output");
+        const connectButton = document.getElementById("connect");
+        const sendButton = document.getElementById("send");
+        const messageInput = document.getElementById("message");
+
+        // Append log to output div
+        function logMessage(message) {
+            const log = document.createElement("div");
+            log.textContent = message;
+            output.appendChild(log);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Connect to BLE device
+        connectButton.addEventListener("click", async () => {
+            try {
+                logMessage("Requesting Bluetooth device...");
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['0000181c-0000-1000-8000-00805f9b34fb'] // Service UUID
+                });
+
+                logMessage("Connecting to GATT server...");
+                const server = await bleDevice.gatt.connect();
+
+                logMessage("Getting service...");
+                const service = await server.getPrimaryService('0000181c-0000-1000-8000-00805f9b34fb');
+
+                logMessage("Getting characteristic...");
+                bleCharacteristic = await service.getCharacteristic('00002a57-0000-1000-8000-00805f9b34fb');
+
+                logMessage("Connected to device!");
+            } catch (error) {
+                logMessage(`Error: ${error.message}`);
+            }
+        });
+
+        // Send message to BLE device
+        sendButton.addEventListener("click", async () => {
+            const message = messageInput.value;
+            if (bleCharacteristic && message) {
+                const encoder = new TextEncoder();
+                await bleCharacteristic.writeValue(encoder.encode(message));
+                logMessage(`Sent: ${message}`);
+                messageInput.value = "";
+            } else {
+                logMessage("No device connected or message is empty.");
+            }
+        });
+    </script>
+</body>
+</html>

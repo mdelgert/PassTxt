@@ -1,0 +1,40 @@
+{
+    "device": {
+      "name": "MyDevice",
+      "setupMode": false,
+      "timezone": "America/New_York",
+      "defaultTimeout": 500,
+      "bootCount": 0,
+      "bootTime": 0,
+      "bootCommand": "led color green",
+      "singlePress" : "led color white",
+      "doublePress" : "led color blue",
+      "longPress" : "led color red",
+      "userName": "admin",
+      "userPassword": "password"
+    },
+    "wifi": {
+      "ssid": "MyNetwork",
+      "password": "wifiPassword",
+      "scan": true
+    },
+    "mqtt": {
+      "enabled": false,
+      "server": "mqtt.example.com",
+      "port": 1883,
+      "ssl": false,
+      "username": "user",
+      "password": "pass",
+      "subTopic": "device/in",
+      "pubTopic": "device/out"
+    },
+    "security": {
+      "apiKey": "abcdef123456",
+      "apiToken": false,
+      "otaPassword": "password"
+    },
+    "features": {
+      "cors": false,
+      "webHandler": true
+    }
+}

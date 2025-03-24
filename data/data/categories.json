@@ -1,0 +1,32 @@
+{
+    "categories": [
+      {
+        "id": 1,
+        "name": "General"
+      },
+      {
+        "id": 2,
+        "name": "Commands"
+      },
+      {
+        "id": 3,
+        "name": "Passwords"
+      },
+      {
+        "id": 4,
+        "name": "TFT"
+      },
+      {
+        "id": 5,
+        "name": "LED"
+      },
+      {
+        "id": 6,
+        "name": "Home"
+      },
+      {
+        "id": 7,
+        "name": "Work"
+      }
+    ]
+  }

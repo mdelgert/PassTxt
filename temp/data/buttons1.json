@@ -1,0 +1,73 @@
+{
+  "buttons": [
+    {
+      "id": "btn1",
+      "label": "BOA",
+      "action": "showMessage",
+      "style": {
+        "color": "#d4d4d4",
+        "fontSize": "1rem",
+        "backgroundColor": "#3c3c3c",
+        "borderColor": "#444",
+        "borderWidth": "2px",
+        "borderRadius": "8px",
+        "padding": "10px 20px",
+        "width": "100%"
+      },
+      "command": "tft print hello tft1",
+      "tooltip": "This is Button 1"
+    },
+    {
+      "id": "btnHello2",
+      "label": "Hello Tft2",
+      "action": "sendMessage",
+      "command": "tft print hello tft2",
+      "tooltip": "Send a message"
+    },
+    {
+      "id": "btn2",
+      "label": "Hello Mqtt",
+      "action": "sendMessage",
+      "command": "mqtt msg hello",
+      "tooltip": "Send a message"
+    },
+    {
+      "id": "btnledBlue",
+      "label": "Blue",
+      "action": "sendMessage",
+      "command": "led color blue",
+      "tooltip": ""
+    },
+    {
+      "id": "btnledPurple",
+      "label": "Purple",
+      "action": "sendMessage",
+      "command": "led color purple",
+      "tooltip": ""
+    },
+    {
+      "id": "btnPassword2",
+      "label": "Password2",
+      "action": "sendMessage",
+      "command": "hid keys1 password2",
+      "tooltip": "Send password2"
+    },
+    {
+      "id": "btnReboot1",
+      "label": "Reboot",
+      "action": "sendMessage",
+      "command": "reboot",
+      "style": {
+        "color": "#d4d4d4",
+        "fontSize": "1rem",
+        "backgroundColor": "red",
+        "borderColor": "#444",
+        "borderWidth": "2px",
+        "borderRadius": "8px",
+        "padding": "10px 20px",
+        "width": "100%"
+      },
+      "tooltip": "Send reboot"
+    }
+  ]
+}

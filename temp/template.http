@@ -1,0 +1,19 @@
+@baseUrl = http://demo.local
+@token = test
+
+### Get
+GET {{baseUrl}}/template/get
+Authorization: Bearer {{token}}
+
+###
+
+### Set
+POST {{baseUrl}}/template/set
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "example": "hello"
+}
+
+###

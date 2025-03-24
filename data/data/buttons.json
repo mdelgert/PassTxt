@@ -1,0 +1,156 @@
+{
+  "buttons": [
+    {
+      "id": 1738688979201,
+      "name": "CALC",
+      "category": "General",
+      "action": "Command",
+      "command": "DUCKY FILE /scripts/calc.txt",
+      "notes": ""
+    },
+    {
+      "id": 2138688979201,
+      "name": "SYSTEM INFO",
+      "category": "General",
+      "action": "Command",
+      "command": "DUCKY FILE /scripts/systeminfo.txt",
+      "notes": ""
+    },
+    {
+      "id": 3138688979201,
+      "name": "UPDATE WINGET",
+      "category": "General",
+      "action": "Command",
+      "command": "DUCKY FILE /scripts/winget1.txt",
+      "notes": ""
+    },
+    {
+      "id": 2738688979201,
+      "name": "NOTEPAD",
+      "category": "General",
+      "action": "Command",
+      "command": "DUCKY FILE /scripts/notepad.txt",
+      "notes": ""
+    },
+    {
+      "id": 3738688979201,
+      "name": "TFT HELLO",
+      "category": "General",
+      "action": "Command",
+      "command": "tft print hello",
+      "notes": "Print hello to tft"
+    },
+    {
+      "id": 4738688979201,
+      "name": "LOCK IMAGE",
+      "category": "General",
+      "action": "Command",
+      "command": "tft draw lock,45,5,60,60",
+      "notes": ""
+    },
+    {
+      "id": 5738688979201,
+      "name": "UNLOCK IMAGE",
+      "category": "General",
+      "action": "Command",
+      "command": "tft draw unlock,45,5,60,60",
+      "notes": ""
+    },
+    {
+      "id": 6738688979201,
+      "name": "SETTINGS IMAGE",
+      "category": "General",
+      "action": "Command",
+      "command": "tft draw settings,45,5,60,60",
+      "notes": ""
+    },
+    {
+      "id": 7738688979201,
+      "name": "WIFI ON IMAGE",
+      "category": "General",
+      "action": "Command",
+      "command": "tft draw wifion,45,5,60,60",
+      "notes": ""
+    },
+    {
+      "id": 8738688979201,
+      "name": "WIFI OFF IMAGE",
+      "category": "General",
+      "action": "Command",
+      "command": "tft draw wifioff,45,5,60,60",
+      "notes": ""
+    },
+    {
+      "id": 9738688979201,
+      "name": "LED OFF",
+      "category": "General",
+      "action": "Command",
+      "command": "led color black",
+      "notes": "Turn led off"
+    },
+    {
+      "id": 1738019343279,
+      "name": "LED ON",
+      "category": "General",
+      "action": "Command",
+      "command": "led color white",
+      "notes": ""
+    },
+    {
+      "id": 1738019396599,
+      "name": "JIGGLE ON",
+      "category": "General",
+      "action": "Command",
+      "command": "jiggle true",
+      "notes": ""
+    },
+    {
+      "id": 1738019411713,
+      "name": "JIGGLE OFF",
+      "category": "General",
+      "action": "Command",
+      "command": "jiggle false",
+      "notes": ""
+    },
+    {
+      "id": 1738019520898,
+      "name": "LED PURPLE",
+      "category": "General",
+      "action": "Command",
+      "command": "led color purple",
+      "notes": ""
+    },
+    {
+      "id": 1738019539126,
+      "name": "LED GREEN",
+      "category": "General",
+      "action": "Command",
+      "command": "led color green",
+      "notes": ""
+    },
+    {
+      "id": 1738020914074,
+      "name": "SHOW CLOCK",
+      "category": "General",
+      "action": "Command",
+      "command": "tft clock true",
+      "notes": ""
+    },
+    {
+      "id": 1738020928833,
+      "name": "HIDE CLOCK",
+      "category": "General",
+      "action": "Command",
+      "command": "tft clock false",
+      "notes": ""
+    },
+    {
+      "id": 1738044328667,
+      "name": "LOCK WINDOWS",
+      "category": "General",
+      "action": "Command",
+      "command": "script file /scripts/lockwindows.txt",
+      "notes": ""
+    }
+  ]
+}
