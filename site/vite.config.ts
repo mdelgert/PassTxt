@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/ImprovWiFiWeb/' : '/',
+  base: mode === 'production' ? '/PassTxt/' : '/',
   build: {
     rollupOptions: {
       input: {
