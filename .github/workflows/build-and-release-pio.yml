@@ -2,8 +2,8 @@ name: PlatformIO Build
 
 on:
   push:
-    # tags:
-    #   - "v*.*.*"
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
