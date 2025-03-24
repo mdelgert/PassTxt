@@ -7,10 +7,10 @@ import argparse
 
 # Constants (You can adjust these for your project)
 LIMIT_RELEASES = 10  # Set to 0 for no limit (process all releases)
-GITHUB_API_URL = "https://api.github.com/repos/mdelgert/ImprovWiFiWeb/releases"
+GITHUB_API_URL = "https://api.github.com/repos/mdelgert/PassTxt/releases"
 MANIFEST_TEMPLATE = {
     # "home_assistant_domain": "esphome",
-    "funding_url": "https://github.com/mdelgert/ImprovWiFiWeb",
+    "funding_url": "https://github.com/mdelgert/PassTxt",
     "new_install_prompt_erase": True,
 }
 
