@@ -21,3 +21,8 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Date:** 2025-24-03
 **Description:**  
 - Copy of original
+
+### Tag: v1.0.1
+**Date:** 2025-24-03
+**Description:**  
+- Cleanup actions
