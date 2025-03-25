@@ -12,6 +12,11 @@ private:
     static void handleSingleClick();
     static void handleDoubleClick();
     static void handleLongPress();
+    static void handleDuringLongPress();
+    static void handleLongPressStop();
+    static unsigned long longPressStartTime; // Track the start time of the long press
+    static bool rebootTriggered; // Flag to prevent multiple reboots
+    static int lastCountdownValue; // Track the last displayed countdown value
 };
 
 #else
