@@ -1,12 +1,30 @@
-//buttoneditor.js
-
 import {BASE_URL} from './config.js';
 
-//const endPoint = window.location.hostname === "localhost" ? "http://demo1.local" : "";
 const endPoint = BASE_URL;
+const token = "test";
 
 let items = [];
 let editingItemId = null;
+let categories = [];
+
+const fetchCategories = async () => {
+  try {
+    const response = await fetch(`${endPoint}/categories`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      categories = data.categories || [];
+      return categories;
+    } else {
+      console.error("Failed to fetch categories");
+      return [];
+    }
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+    return [];
+  }
+};
 
 const fetchButtons = async () => {
   try {
@@ -14,7 +32,6 @@ const fetchButtons = async () => {
     if (response.ok) {
       const data = await response.json();
       items = data.buttons || [];
-      populateCategoryFilter(items);
       renderList();
     } else {
       console.error("Failed to fetch buttons");
@@ -24,13 +41,9 @@ const fetchButtons = async () => {
   }
 };
 
-// Populate the category filter dropdown
-function populateCategoryFilter(buttons) {
-  const categorySet = new Set(buttons.map(button => button.category));
-  const categoryFilter = document.getElementById("categoryFilter");
-
+function populateCategoryFilter(categoryFilter, buttons) {
   categoryFilter.innerHTML = '<option value="all">All</option>';
-
+  const categorySet = new Set(buttons.map(button => button.category));
   categorySet.forEach(category => {
     const option = document.createElement("option");
     option.value = category;
@@ -45,7 +58,63 @@ function populateCategoryFilter(buttons) {
   });
 }
 
-// Update renderList function to accept filtered items
+function populateEditCategory(editCategory, newCategoryBox) {
+  editCategory.innerHTML = "";
+  categories.forEach(cat => {
+    const option = document.createElement("option");
+    option.value = cat.name;
+    option.textContent = cat.name;
+    editCategory.appendChild(option);
+  });
+
+  // Add divider and "Add new..." option
+  const divider = document.createElement("option");
+  divider.disabled = true;
+  divider.textContent = "────────────";
+  editCategory.appendChild(divider);
+
+  const addNew = document.createElement("option");
+  addNew.value = "add-new";
+  addNew.textContent = "➕ Add new category…";
+  editCategory.appendChild(addNew);
+
+  // Toggle new category box visibility
+  editCategory.addEventListener("change", () => {
+    newCategoryBox.style.display = editCategory.value === "add-new" ? "block" : "none";
+  });
+}
+
+async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput) {
+  const name = newCategoryNameInput.value.trim();
+  if (!name) return alert("Enter a category name");
+
+  try {
+    const res = await fetch(`${endPoint}/categories`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ categories: [{ name }] })
+    });
+
+    const data = await res.json();
+    const newCat = data.categories?.[0];
+    if (!newCat) throw new Error("No category returned");
+
+    // Refresh categories and repopulate dropdown
+    await fetchCategories();
+    populateEditCategory(editCategory, newCategoryBox);
+    editCategory.value = newCat.name; // Select the newly added category
+
+    newCategoryBox.style.display = "none";
+    newCategoryNameInput.value = "";
+  } catch (err) {
+    alert("Failed to save category");
+    console.error(err);
+  }
+}
+
 function renderList(filteredItems = items) {
   const itemList = document.getElementById("itemList");
   if (!itemList) return console.error("itemList not found");
@@ -53,60 +122,40 @@ function renderList(filteredItems = items) {
 
   filteredItems.forEach((item) => {
     const li = document.createElement("li");
-    li.style.cursor = "pointer"; // Hand cursor
-    li.style.padding = "8px"; // Optional: Basic padding for spacing
-    //li.style.backgroundColor = "#fff"; // Optional: White background
+    li.style.cursor = "pointer";
+    li.style.padding = "8px";
     li.innerHTML = `
       <span>${item.name}</span>
       <div class="actions" style="display: inline-block; margin-left: 10px;">
-        <button onclick="openModal(${item.id}); event.stopPropagation();">Edit</button>
-        <button onclick="deleteItem(${item.id}); event.stopPropagation();">Delete</button>
+        <button class="edit-btn" data-id="${item.id}">Edit</button>
+        <button class="delete-btn" data-id="${item.id}">Delete</button>
       </div>
     `;
 
-    // Hover effect for hand cursor and visual feedback
-    li.addEventListener("mouseover", () => {
-      li.style.backgroundColor = "#222222";
-    });
-
-    li.addEventListener("mouseout", () => {
-      li.style.backgroundColor = "#1e1e1e";
-    });
-
-    // Make entire li clickable to open modal, except buttons
+    li.addEventListener("mouseover", () => li.style.backgroundColor = "#222222");
+    li.addEventListener("mouseout", () => li.style.backgroundColor = "#1e1e1e");
     li.addEventListener("click", (e) => {
-      if (e.target.tagName !== "BUTTON") {
-        openModal(item.id);
-      }
+      if (e.target.tagName !== "BUTTON") openModal(item.id);
     });
-
-    // Accessibility: Make li focusable and keyboard-accessible
     li.setAttribute("tabindex", "0");
     li.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        openModal(item.id);
-      }
+      if (e.key === "Enter") openModal(item.id);
     });
-    
+
     itemList.appendChild(li);
   });
-}
 
-function renderListOriginal(filteredItems = items) {
-  const itemList = document.getElementById("itemList");
-  itemList.innerHTML = "";
-
-  filteredItems.forEach((item) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span>${item.name}</span>
-      <div class="actions">
-        <button onclick="sendCommand('${encodeURIComponent(item.command)}')">Run</button>
-        <button onclick="openModal(${item.id})">Edit</button>
-        <button onclick="deleteItem(${item.id})">Delete</button>
-      </div>`;
-      
-    itemList.appendChild(li);
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openModal(parseInt(btn.dataset.id));
+    });
+  });
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteItem(parseInt(btn.dataset.id));
+    });
   });
 }
 
@@ -127,7 +176,7 @@ function openModal(id) {
 function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
-  document.getElementById("editCategory").value = "General";
+  document.getElementById("editCategory").value = categories[0]?.name || "";
   document.getElementById("editAction").value = "Command";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
@@ -139,6 +188,7 @@ function openModalForAdd() {
 
 function closeModal() {
   document.getElementById("editModal").style.display = "none";
+  document.getElementById("new-category-box").style.display = "none"; // Reset new category box
 }
 
 async function saveChanges() {
@@ -150,6 +200,7 @@ async function saveChanges() {
   const password = document.getElementById("editPassword").value;
   const notes = document.getElementById("editNotes").value;
   if (!name || !command) return;
+  if (category === "add-new") return alert("Please save or select a valid category");
 
   const button = { 
     id: editingItemId || Date.now(), 
@@ -181,7 +232,7 @@ async function saveChanges() {
 }
 
 async function deleteItem(id) {
-  if (!confirm("Are you sure you want to delete this item?")) return;
+  //if (!confirm("Are you sure you want to delete this item?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (response.ok) {
@@ -194,52 +245,23 @@ async function deleteItem(id) {
   }
 }
 
-async function deleteItemOriginal(id) {
-  try {
-    const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (response.ok) {
-      await fetchButtons();
-    } else {
-      console.error("Failed to delete button");
-    }
-  } catch (err) {
-    console.error("Error deleting button:", err);
-  }
+async function init() {
+  const categoryFilter = document.getElementById("categoryFilter");
+  const editCategory = document.getElementById("editCategory");
+  const newCategoryBox = document.getElementById("new-category-box");
+  const newCategoryNameInput = document.getElementById("new-category-name");
+  const saveNewCategoryBtn = document.getElementById("save-new-category");
+
+  await fetchCategories();
+  populateEditCategory(editCategory, newCategoryBox);
+  await fetchButtons();
+  populateCategoryFilter(categoryFilter, items);
+
+  document.querySelector("button[onclick='openModalForAdd()']").addEventListener("click", openModalForAdd);
+  document.getElementById("saveChanges").addEventListener("click", saveChanges);
+  document.getElementById("closeModal").addEventListener("click", closeModal);
+  document.getElementById("closeModalFooter").addEventListener("click", closeModal);
+  saveNewCategoryBtn.addEventListener("click", () => saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
 }
 
-async function sendCommand(command) {
-  const decodedCommand = decodeURIComponent(command);
-
-  if (navigator.vibrate) {
-    navigator.vibrate(50);
-  }
-
-  try {
-    const response = await fetch(`${endPoint}/command/set`, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" },
-      body: decodedCommand,
-    });
-
-    if (response.ok) {
-      console.log(`Command sent successfully: ${decodedCommand}`);
-    } else {
-      console.error(`Failed to send command. Status: ${response.status}`);
-      alert("Failed to send command");
-    }
-  } catch (error) {
-    console.error("Error sending command:", error);
-    alert("Error sending command");
-  }
-}
-
-// Expose functions globally so HTML `onclick` attributes work
-window.openModalForAdd = openModalForAdd;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.saveChanges = saveChanges;
-window.deleteItem = deleteItem;
-window.sendCommand = sendCommand;
-
-// Initialize buttons on page load
-fetchButtons();
+export { init };
