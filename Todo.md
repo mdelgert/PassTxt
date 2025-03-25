@@ -1,5 +1,7 @@
 ## Active
-- []
+- [] Cleanup mqtt
+- [] Cleanup ducky script
+
 ### Bugs
 - []
 

@@ -126,7 +126,7 @@ void MqttHandler::connectToMqtt()
         //isConnected = 
         mqttClient.connect(settings.device.name.c_str());
     }
-
+    
     //if (isConnected)
     if (mqttClient.connected())
     {

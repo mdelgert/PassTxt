@@ -31,3 +31,8 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Date:** 2025-25-03
 **Description:**  
 - Cleanup categories
+
+### Tag: v1.0.3
+**Date:** TODO
+**Description:**  
+-
