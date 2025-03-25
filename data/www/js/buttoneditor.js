@@ -215,9 +215,10 @@ async function saveChanges() {
   const notes = document.getElementById("editNotes").value;
   if (!name || !command) return;
   if (category === "add-new") return alert("Please save or select a valid category");
-
+  
   const button = { 
-    id: editingItemId || Date.now(), 
+    //id: editingItemId || Date.now(),
+    id: editingItemId || null,
     name,
     category, 
     action,
@@ -246,7 +247,7 @@ async function saveChanges() {
 }
 
 async function deleteItem(id) {
-  if (!confirm("Are you sure you want to delete this item?")) return;
+  //if (!confirm("Are you sure you want to delete this item?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (response.ok) {
