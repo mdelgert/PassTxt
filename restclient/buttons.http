@@ -1,4 +1,4 @@
-@baseUrl = http://demo1.local
+@baseUrl = http://passtxt1.local
 @token = test
 
 ### Get All Buttons
@@ -15,20 +15,11 @@ Content-Type: application/json
 {
   "buttons": [
     {
-      "id": 1,
       "name": "WiFi Password",
       "category": "Passwords",
       "action": "Type",
-      "command": "password123",
+      "command": "",
       "notes": "Updated WiFi password for guests"
-    },
-    {
-      "id": 3,
-      "name": "Turn On LEDs",
-      "category": "LED Controls",
-      "action": "Run",
-      "command": "led on",
-      "notes": "Turns on all LED lights"
     }
   ]
 }

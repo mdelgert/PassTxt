@@ -30,11 +30,15 @@
         </div>
         <div class="modal-body">
           <input type="text" id="editName" placeholder="Button Label" required>
+          <label for="editCategory">Category</label>
           <select id="editCategory"></select>
           <!-- Add New Category Input -->
-          <div id="new-category-box" style="display: none; margin-top: 8px;">
-            <input type="text" id="new-category-name" placeholder="New category name" style="width: 100%; padding: 8px; margin-bottom: 8px;" />
-            <button id="save-new-category" style="padding: 8px 16px; background-color: #2563eb; color: white; border: none; border-radius: 4px;">Save</button>
+          <div id="new-category-box">
+            <input type="text" id="new-category-name" placeholder="New category name" />
+            <div class="new-category-actions">
+              <button id="save-new-category">Save</button>
+              <button id="cancel-new-category">Cancel</button>
+            </div>
           </div>
           <select id="editAction">
             <option value="Password">Password</option>

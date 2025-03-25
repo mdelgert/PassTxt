@@ -6,6 +6,7 @@ const token = "test";
 let items = [];
 let editingItemId = null;
 let categories = [];
+let previousCategory = null; // Store the previously selected category
 
 const fetchCategories = async () => {
   try {
@@ -67,7 +68,6 @@ function populateEditCategory(editCategory, newCategoryBox) {
     editCategory.appendChild(option);
   });
 
-  // Add divider and "Add new..." option
   const divider = document.createElement("option");
   divider.disabled = true;
   divider.textContent = "────────────";
@@ -78,9 +78,14 @@ function populateEditCategory(editCategory, newCategoryBox) {
   addNew.textContent = "➕ Add new category…";
   editCategory.appendChild(addNew);
 
-  // Toggle new category box visibility
   editCategory.addEventListener("change", () => {
-    newCategoryBox.style.display = editCategory.value === "add-new" ? "block" : "none";
+    if (editCategory.value === "add-new") {
+      previousCategory = editCategory.value; // Store the current selection before switching
+      newCategoryBox.style.display = "block";
+    } else {
+      previousCategory = editCategory.value; // Update the previous selection
+      newCategoryBox.style.display = "none";
+    }
   });
 }
 
@@ -102,10 +107,9 @@ async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInpu
     const newCat = data.categories?.[0];
     if (!newCat) throw new Error("No category returned");
 
-    // Refresh categories and repopulate dropdown
     await fetchCategories();
     populateEditCategory(editCategory, newCategoryBox);
-    editCategory.value = newCat.name; // Select the newly added category
+    editCategory.value = newCat.name;
 
     newCategoryBox.style.display = "none";
     newCategoryNameInput.value = "";
@@ -113,6 +117,12 @@ async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInpu
     alert("Failed to save category");
     console.error(err);
   }
+}
+
+function cancelNewCategory(editCategory, newCategoryBox, newCategoryNameInput) {
+  newCategoryBox.style.display = "none";
+  newCategoryNameInput.value = "";
+  editCategory.value = previousCategory && previousCategory !== "add-new" ? previousCategory : categories[0]?.name || ""; // Reset to previous or first category
 }
 
 function renderList(filteredItems = items) {
@@ -164,6 +174,7 @@ function openModal(id) {
   const item = items.find((i) => i.id === id);
   document.getElementById("editName").value = item.name;
   document.getElementById("editCategory").value = item.category;
+  previousCategory = item.category; // Store the initial category
   document.getElementById("editAction").value = item.action;
   document.getElementById("editCommand").value = item.command || "";
   document.getElementById("editUserName").value = item.userName || "";
@@ -171,12 +182,14 @@ function openModal(id) {
   document.getElementById("editNotes").value = item.notes || "";
   document.getElementById("modalTitle").textContent = "Edit Button";
   document.getElementById("editModal").style.display = "flex";
+  document.getElementById("new-category-box").style.display = "none";
 }
 
 function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
   document.getElementById("editCategory").value = categories[0]?.name || "";
+  previousCategory = categories[0]?.name || ""; // Store the initial category
   document.getElementById("editAction").value = "Command";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
@@ -184,11 +197,12 @@ function openModalForAdd() {
   document.getElementById("editNotes").value = "";
   document.getElementById("modalTitle").textContent = "Add New Button";
   document.getElementById("editModal").style.display = "flex";
+  document.getElementById("new-category-box").style.display = "none";
 }
 
 function closeModal() {
   document.getElementById("editModal").style.display = "none";
-  document.getElementById("new-category-box").style.display = "none"; // Reset new category box
+  document.getElementById("new-category-box").style.display = "none";
 }
 
 async function saveChanges() {
@@ -232,7 +246,7 @@ async function saveChanges() {
 }
 
 async function deleteItem(id) {
-  //if (!confirm("Are you sure you want to delete this item?")) return;
+  if (!confirm("Are you sure you want to delete this item?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (response.ok) {
@@ -251,6 +265,7 @@ async function init() {
   const newCategoryBox = document.getElementById("new-category-box");
   const newCategoryNameInput = document.getElementById("new-category-name");
   const saveNewCategoryBtn = document.getElementById("save-new-category");
+  const cancelNewCategoryBtn = document.getElementById("cancel-new-category");
 
   await fetchCategories();
   populateEditCategory(editCategory, newCategoryBox);
@@ -262,6 +277,7 @@ async function init() {
   document.getElementById("closeModal").addEventListener("click", closeModal);
   document.getElementById("closeModalFooter").addEventListener("click", closeModal);
   saveNewCategoryBtn.addEventListener("click", () => saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
+  cancelNewCategoryBtn.addEventListener("click", () => cancelNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
 }
 
 export { init };
