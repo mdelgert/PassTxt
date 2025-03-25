@@ -13,9 +13,10 @@
   --font-size: 1rem;
   --error-bg: #4b1c1c;
   --error-text: #ff5555;
-  --input-border: #555; /* Slightly lighter border for better contrast */
+  --input-border: #555;
   --input-bg: #222;
   --dropdown-arrow-color: #ffffff;
+  --placeholder-color: #bbb; /* Lighter gray for placeholder text */
 }
 
 /* Body Styling */
@@ -84,22 +85,20 @@ button:hover {
 
 /* Filter Container Styling (Main Page) */
 #filterContainer {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Space between label, dropdown, and button */
-  margin-bottom: 20px;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  margin-bottom: 15px;
 }
 
-#categoryFilterLabel {
-  font-size: 0.9rem;
-  color: #bbb;
-  margin-right: 5px;
+#filterContainer .filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 #categoryFilter {
-  width: 200px; /* Fixed width for better balance */
-  margin: 0; /* Remove default margin to align with flex */
+  width: 200px;
+  margin: 0;
 }
 
 /* Input & Select Styling */
@@ -107,28 +106,36 @@ input,
 select,
 textarea {
   width: calc(100% - 20px);
-  margin: 10px 0;
+  margin: 5px 0; /* Reduced margin for compact layout */
   padding: 10px;
   border-radius: var(--border-radius);
   border: 2px solid var(--input-border);
   background: var(--input-bg);
   color: var(--text-color);
   font-size: var(--font-size);
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  box-sizing: border-box;
+}
+
+/* Placeholder Styling */
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1; /* Ensure placeholder is fully visible */
+}
+
+select:invalid {
+  color: var(--placeholder-color); /* Style the placeholder option in dropdown */
+}
+
+/* Ensure the selected option in dropdown is white */
+select option {
+  color: var(--text-color);
+  background: var(--input-bg);
 }
 
 textarea {
   resize: none;
   height: 80px;
-}
-
-/* Label Styling */
-label {
-  display: block;
-  text-align: left;
-  margin: 5px 0 2px 0;
-  font-size: 0.9rem;
-  color: #bbb;
 }
 
 /* Dropdown Styling */
@@ -138,13 +145,13 @@ select {
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 12px;
-  padding-right: 30px; /* Space for the arrow */
+  padding-right: 30px;
   transition: border-color 0.3s ease;
 }
 
 select:hover,
 select:focus {
-  border-color: var(--button-hover-bg); /* Highlight on hover/focus */
+  border-color: var(--button-hover-bg);
   outline: none;
 }
 
@@ -211,8 +218,7 @@ select:focus {
 /* New Category Box Styling */
 #new-category-box {
   display: none;
-  margin-top: 10px;
-  margin-bottom: 15px;
+  margin: 5px 0 10px 0; /* Reduced margin for compact layout */
   padding: 10px;
   background: #252525;
   border-radius: var(--border-radius);
@@ -254,4 +260,17 @@ select:focus {
 #cancel-new-category:hover {
   background-color: var(--button-hover-bg);
   border-color: var(--button-hover-bg);
+}
+
+/* Responsive Design */
+@media (max-width: 400px) {
+  #categoryFilter {
+      width: 150px;
+  }
+
+  #filterContainer .filter-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+  }
 }

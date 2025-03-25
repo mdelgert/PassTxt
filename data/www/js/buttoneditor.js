@@ -45,7 +45,6 @@ const fetchButtons = async () => {
   }
 };
 
-// Helper function to get category name by ID
 function getCategoryNameById(id) {
   const category = categories.find(cat => cat.id === id);
   return category ? category.name : "Unknown";
@@ -70,10 +69,10 @@ function populateCategoryFilter(categoryFilter, buttons) {
 }
 
 function populateEditCategory(editCategory, newCategoryBox) {
-  editCategory.innerHTML = "";
+  editCategory.innerHTML = '<option value="" disabled selected>Select category</option>'; // Placeholder for dropdown
   categories.forEach(cat => {
     const option = document.createElement("option");
-    option.value = cat.id; // Use ID as the value
+    option.value = cat.id;
     option.textContent = cat.name;
     editCategory.appendChild(option);
   });
@@ -95,7 +94,7 @@ function populateEditCategory(editCategory, newCategoryBox) {
     } else {
       previousCategoryId = editCategory.value;
       newCategoryBox.style.display = "none";
-      clearNewCategoryError(); // Clear error when changing selection
+      clearNewCategoryError();
     }
   });
 }
@@ -131,7 +130,6 @@ async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInpu
     return;
   }
 
-  // Check for duplicate category name (case-insensitive)
   const duplicate = categories.some(cat => cat.name.toLowerCase() === name.toLowerCase());
   if (duplicate) {
     showNewCategoryError("A category with this name already exists.");
@@ -188,8 +186,8 @@ function renderList(filteredItems = items) {
     li.innerHTML = `
       <span>${item.name}</span>
       <div class="actions" style="display: inline-block; margin-left: 10px;">
-        <button class="edit-btn" data-id="${item.id}">Edit</button>
-        <button class="delete-btn" data-id="${item.id}">Delete</button>
+        <button class="edit-btn" data-id="${item.id}" aria-label="Edit ${item.name}">Edit</button>
+        <button class="delete-btn" data-id="${item.id}" aria-label="Delete ${item.name}">Delete</button>
       </div>
     `;
 

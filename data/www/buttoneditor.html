@@ -1,4 +1,3 @@
-<!-- buttoneditor.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,42 +14,43 @@
   <main>
     <div class="container">
       <div id="filterContainer">
-        <label id="categoryFilterLabel" for="categoryFilter">Category:</label>
-        <select id="categoryFilter">
-          <option value="all">All</option>
-        </select>
-        <button onclick="openModalForAdd()">Add Button</button>
+        <div class="filter-actions">
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All</option>
+          </select>
+          <button onclick="openModalForAdd()">Add Button</button>
+        </div>
       </div>
-      <ul id="itemList"></ul>
+      <ul id="itemList" aria-label="List of buttons"></ul>
     </div>
     <div class="modal" id="editModal">
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="modalTitle">Edit Button</h2>
-          <button id="closeModal">X</button>
+          <button id="closeModal" aria-label="Close modal">X</button>
         </div>
-        <div class="modal-error" id="modalError"></div> <!-- General error message -->
+        <div class="modal-error" id="modalError"></div>
         <div class="modal-body">
-          <input type="text" id="editName" placeholder="Button Label" required>
-          <label for="editCategory">Category</label>
-          <select id="editCategory"></select>
-          <!-- Add New Category Input -->
+          <input type="text" id="editName" placeholder="Button Label" required aria-label="Button Label" aria-required="true">
+          <select id="editCategory" aria-label="Select category">
+            <!-- Options populated dynamically -->
+          </select>
           <div id="new-category-box">
-            <input type="text" id="new-category-name" placeholder="New category name" />
-            <div class="new-category-error" id="newCategoryError"></div> <!-- Category-specific error -->
+            <input type="text" id="new-category-name" placeholder="New category name" aria-label="New category name" />
+            <div class="new-category-error" id="newCategoryError"></div>
             <div class="new-category-actions">
               <button id="save-new-category">Save</button>
               <button id="cancel-new-category">Cancel</button>
             </div>
           </div>
-          <select id="editAction">
+          <select id="editAction" aria-label="Select action">
             <option value="Password">Password</option>
             <option value="Command">Command</option>
           </select>
-          <input type="text" id="editCommand" placeholder="Command" required>
-          <input type="text" id="editUserName" placeholder="User Name">
-          <input type="text" id="editPassword" placeholder="Password">
-          <textarea id="editNotes" placeholder="Notes (optional)"></textarea>
+          <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
+          <input type="text" id="editUserName" placeholder="User Name" aria-label="User Name">
+          <input type="text" id="editPassword" placeholder="Password" aria-label="Password">
+          <textarea id="editNotes" placeholder="Notes (optional)" aria-label="Notes"></textarea>
         </div>
         <div class="modal-footer">
           <button id="saveChanges">Save</button>
