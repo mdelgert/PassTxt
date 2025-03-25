@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "CALC",
-      "category": "General",
+      "categoryId": 1,
       "action": "Command",
       "command": "DUCKY FILE /scripts/calc.txt",
       "notes": ""
@@ -11,7 +11,7 @@
     {
       "id": 2,
       "name": "SYSTEM INFO",
-      "category": "General",
+      "categoryId": 1,
       "action": "Command",
       "command": "DUCKY FILE /scripts/systeminfo.txt",
       "notes": ""
@@ -19,7 +19,7 @@
     {
       "id": 3,
       "name": "UPDATE WINGET",
-      "category": "General",
+      "categoryId": 1,
       "action": "Command",
       "command": "DUCKY FILE /scripts/winget1.txt",
       "notes": ""
@@ -27,7 +27,7 @@
     {
       "id": 4,
       "name": "NOTEPAD",
-      "category": "General",
+      "categoryId": 1,
       "action": "Command",
       "command": "DUCKY FILE /scripts/notepad.txt",
       "notes": ""
@@ -35,7 +35,7 @@
     {
       "id": 5,
       "name": "TFT HELLO",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft print hello",
       "notes": "Print hello to tft"
@@ -43,7 +43,7 @@
     {
       "id": 6,
       "name": "LOCK IMAGE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft draw lock,45,5,60,60",
       "notes": ""
@@ -51,7 +51,7 @@
     {
       "id": 7,
       "name": "UNLOCK IMAGE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft draw unlock,45,5,60,60",
       "notes": ""
@@ -59,7 +59,7 @@
     {
       "id": 8,
       "name": "SETTINGS IMAGE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft draw settings,45,5,60,60",
       "notes": ""
@@ -67,7 +67,7 @@
     {
       "id": 9,
       "name": "WIFI ON IMAGE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft draw wifion,45,5,60,60",
       "notes": ""
@@ -75,7 +75,7 @@
     {
       "id": 10,
       "name": "WIFI OFF IMAGE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft draw wifioff,45,5,60,60",
       "notes": ""
@@ -83,7 +83,7 @@
     {
       "id": 11,
       "name": "LED OFF",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "led color black",
       "notes": "Turn led off"
@@ -91,7 +91,7 @@
     {
       "id": 12,
       "name": "LED ON",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "led color white",
       "notes": ""
@@ -99,7 +99,7 @@
     {
       "id": 13,
       "name": "JIGGLE ON",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "jiggle true",
       "notes": ""
@@ -107,7 +107,7 @@
     {
       "id": 14,
       "name": "JIGGLE OFF",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "jiggle false",
       "notes": ""
@@ -115,7 +115,7 @@
     {
       "id": 15,
       "name": "LED PURPLE",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "led color purple",
       "notes": ""
@@ -123,7 +123,7 @@
     {
       "id": 16,
       "name": "LED GREEN",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "led color green",
       "notes": ""
@@ -131,7 +131,7 @@
     {
       "id": 17,
       "name": "SHOW CLOCK",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft clock true",
       "notes": ""
@@ -139,7 +139,7 @@
     {
       "id": 18,
       "name": "HIDE CLOCK",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "tft clock false",
       "notes": ""
@@ -147,7 +147,7 @@
     {
       "id": 19,
       "name": "LOCK WINDOWS",
-      "category": "General",
+      "categoryId": 2,
       "action": "Command",
       "command": "script file /scripts/lockwindows.txt",
       "notes": ""
