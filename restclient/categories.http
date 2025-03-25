@@ -1,4 +1,4 @@
-@baseUrl = http://demo1.local
+@baseUrl = http://passtxt1.local
 @token = test
 
 ### Get all categories
@@ -15,7 +15,7 @@ Content-Type: application/json
 {
   "categories": [
     {
-      "name": "Test1"
+      "name": "Test2"
     }
   ]
 }
