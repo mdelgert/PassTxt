@@ -14,7 +14,7 @@ NonBlockingTimer JiggleHandler::jiggleTimer(DEFAULT_JIGGLE_INTERVAL, 1000); // 1
 int JiggleHandler::jiggleInterval = DEFAULT_JIGGLE_INTERVAL;                // Use the same default interval here
 int JiggleHandler::jiggleAmount = DEFAULT_JIGGLE_AMOUNT;                    // Default jiggle amount
 bool JiggleHandler::showCountdown = true;                                   // Show countdown by default
-bool JiggleHandler::jiggleEnabled = true;                                   // Jiggle initially disabled
+bool JiggleHandler::jiggleEnabled = false;                                   // Jiggle initially disabled
 
 void JiggleHandler::init()
 {
@@ -30,7 +30,7 @@ void JiggleHandler::loop()
         {
             unsigned long timeRemaining = jiggleTimer.remaining();
             unsigned long secondsRemaining = (timeRemaining + 999) / 1000; // Round up to the nearest second
-            //GfxHandler::printMessage(String("Jiggle: ") + secondsRemaining);
+            GfxHandler::printMessage(String("Jiggle: ") + secondsRemaining);
             debugV("Jiggle countdown: %lu ms remaining", timeRemaining);
         }
 
