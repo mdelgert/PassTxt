@@ -1,7 +1,7 @@
 {
   "buttons": [
     {
-      "id": 1738688979201,
+      "id": 1,
       "name": "CALC",
       "category": "General",
       "action": "Command",
@@ -9,7 +9,7 @@
       "notes": ""
     },
     {
-      "id": 2138688979201,
+      "id": 2,
       "name": "SYSTEM INFO",
       "category": "General",
       "action": "Command",
@@ -17,7 +17,7 @@
       "notes": ""
     },
     {
-      "id": 3138688979201,
+      "id": 3,
       "name": "UPDATE WINGET",
       "category": "General",
       "action": "Command",
@@ -25,7 +25,7 @@
       "notes": ""
     },
     {
-      "id": 2738688979201,
+      "id": 4,
       "name": "NOTEPAD",
       "category": "General",
       "action": "Command",
@@ -33,7 +33,7 @@
       "notes": ""
     },
     {
-      "id": 3738688979201,
+      "id": 5,
       "name": "TFT HELLO",
       "category": "General",
       "action": "Command",
@@ -41,7 +41,7 @@
       "notes": "Print hello to tft"
     },
     {
-      "id": 4738688979201,
+      "id": 6,
       "name": "LOCK IMAGE",
       "category": "General",
       "action": "Command",
@@ -49,7 +49,7 @@
       "notes": ""
     },
     {
-      "id": 5738688979201,
+      "id": 7,
       "name": "UNLOCK IMAGE",
       "category": "General",
       "action": "Command",
@@ -57,7 +57,7 @@
       "notes": ""
     },
     {
-      "id": 6738688979201,
+      "id": 8,
       "name": "SETTINGS IMAGE",
       "category": "General",
       "action": "Command",
@@ -65,7 +65,7 @@
       "notes": ""
     },
     {
-      "id": 7738688979201,
+      "id": 9,
       "name": "WIFI ON IMAGE",
       "category": "General",
       "action": "Command",
@@ -73,7 +73,7 @@
       "notes": ""
     },
     {
-      "id": 8738688979201,
+      "id": 10,
       "name": "WIFI OFF IMAGE",
       "category": "General",
       "action": "Command",
@@ -81,7 +81,7 @@
       "notes": ""
     },
     {
-      "id": 9738688979201,
+      "id": 11,
       "name": "LED OFF",
       "category": "General",
       "action": "Command",
@@ -89,7 +89,7 @@
       "notes": "Turn led off"
     },
     {
-      "id": 1738019343279,
+      "id": 12,
       "name": "LED ON",
       "category": "General",
       "action": "Command",
@@ -97,7 +97,7 @@
       "notes": ""
     },
     {
-      "id": 1738019396599,
+      "id": 13,
       "name": "JIGGLE ON",
       "category": "General",
       "action": "Command",
@@ -105,7 +105,7 @@
       "notes": ""
     },
     {
-      "id": 1738019411713,
+      "id": 14,
       "name": "JIGGLE OFF",
       "category": "General",
       "action": "Command",
@@ -113,7 +113,7 @@
       "notes": ""
     },
     {
-      "id": 1738019520898,
+      "id": 15,
       "name": "LED PURPLE",
       "category": "General",
       "action": "Command",
@@ -121,7 +121,7 @@
       "notes": ""
     },
     {
-      "id": 1738019539126,
+      "id": 16,
       "name": "LED GREEN",
       "category": "General",
       "action": "Command",
@@ -129,7 +129,7 @@
       "notes": ""
     },
     {
-      "id": 1738020914074,
+      "id": 17,
       "name": "SHOW CLOCK",
       "category": "General",
       "action": "Command",
@@ -137,7 +137,7 @@
       "notes": ""
     },
     {
-      "id": 1738020928833,
+      "id": 18,
       "name": "HIDE CLOCK",
       "category": "General",
       "action": "Command",
@@ -145,7 +145,7 @@
       "notes": ""
     },
     {
-      "id": 1738044328667,
+      "id": 19,
       "name": "LOCK WINDOWS",
       "category": "General",
       "action": "Command",

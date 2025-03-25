@@ -1,19 +1,48 @@
-//buttons.js
+// buttons.js
 
-//import "./global.js";
-import {BASE_URL} from './config.js';
+import { BASE_URL } from './config.js';
 
 const endPoint = BASE_URL;
 
-let allButtons = []; // Store all buttons globally
+let allButtons = [];
+let categories = [];
+
+// Fetch Categories
+async function fetchCategories() {
+  try {
+    const response = await fetch(`${endPoint}/categories`, {
+      headers: { Authorization: `Bearer test` } // Match the token used in buttoneditor.js
+    });
+    if (response.ok) {
+      const data = await response.json();
+      categories = data.categories || [];
+      return categories;
+    } else {
+      throw new Error("Failed to fetch categories");
+    }
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+    showMessage("Failed to load categories. Please try again.");
+    return [];
+  }
+}
+
+// Helper function to get category name by ID
+function getCategoryNameById(id) {
+  const category = categories.find(cat => cat.id === id);
+  return category ? category.name : "Unknown";
+}
 
 // Fetch and Render Buttons
 export async function fetchButtons() {
   try {
+    // Fetch categories first
+    await fetchCategories();
+
     const response = await fetch(`${endPoint}/buttons`);
     if (!response.ok) throw new Error("Failed to fetch buttons");
     const data = await response.json();
-    allButtons = data.buttons; // Store data globally
+    allButtons = data.buttons || [];
     populateCategoryDropdown(allButtons);
     renderButtons(allButtons);
   } catch (error) {
@@ -25,9 +54,22 @@ export async function fetchButtons() {
   }
 }
 
+// Show Message in Message Box
+function showMessage(message) {
+  const messageBox = document.getElementById("message-box");
+  if (messageBox) {
+    messageBox.textContent = message;
+    messageBox.classList.remove("hidden");
+    setTimeout(() => {
+      messageBox.classList.add("hidden");
+      messageBox.textContent = "";
+    }, 3000); // Hide after 3 seconds
+  }
+}
+
 // Populate Dropdown with Unique Categories
 function populateCategoryDropdown(buttons) {
-  const categorySet = new Set(buttons.map(button => button.category));
+  const categorySet = new Set(buttons.map(button => button.categoryId));
   const categoryFilter = document.getElementById("categoryFilter");
 
   if (!categoryFilter) return;
@@ -36,17 +78,18 @@ function populateCategoryDropdown(buttons) {
   categoryFilter.innerHTML = '<option value="all">All</option>';
 
   // Add categories dynamically
-  categorySet.forEach(category => {
+  categorySet.forEach(categoryId => {
+    const categoryName = getCategoryNameById(categoryId);
     const option = document.createElement("option");
-    option.value = category;
-    option.textContent = category;
+    option.value = categoryId;
+    option.textContent = categoryName;
     categoryFilter.appendChild(option);
   });
 
   // Attach event listener for filtering
   categoryFilter.addEventListener("change", () => {
-    const selectedCategory = categoryFilter.value;
-    const filteredButtons = selectedCategory === "all" ? allButtons : allButtons.filter(button => button.category === selectedCategory);
+    const selectedCategoryId = categoryFilter.value;
+    const filteredButtons = selectedCategoryId === "all" ? allButtons : allButtons.filter(button => button.categoryId === parseInt(selectedCategoryId));
     renderButtons(filteredButtons);
   });
 }
@@ -103,15 +146,15 @@ export async function sendCommand(command) {
     if (response.ok) {
       console.log(`Command sent: ${command}`);
     } else {
-      alert("Failed to send command");
+      showMessage("Failed to send command");
     }
   } catch (error) {
     console.error("Error sending command:", error);
-    alert("Error sending command");
+    showMessage("Error sending command");
   }
 }
 
-// Ensure `fetchButtons` runs **after the DOM is loaded**
+// Ensure `fetchButtons` runs after the DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   fetchButtons();
 });
