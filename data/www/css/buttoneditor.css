@@ -11,6 +11,11 @@
   --padding-small: 10px;
   --padding-large: 20px;
   --font-size: 1rem;
+  --error-bg: #4b1c1c;
+  --error-text: #ff5555;
+  --input-border: #555; /* Slightly lighter border for better contrast */
+  --input-bg: #222;
+  --dropdown-arrow-color: #ffffff;
 }
 
 /* Body Styling */
@@ -77,6 +82,26 @@ button:hover {
   border-color: var(--button-hover-bg);
 }
 
+/* Filter Container Styling (Main Page) */
+#filterContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between label, dropdown, and button */
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+#categoryFilterLabel {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-right: 5px;
+}
+
+#categoryFilter {
+  width: 200px; /* Fixed width for better balance */
+  margin: 0; /* Remove default margin to align with flex */
+}
+
 /* Input & Select Styling */
 input,
 select,
@@ -85,10 +110,11 @@ textarea {
   margin: 10px 0;
   padding: 10px;
   border-radius: var(--border-radius);
-  border: 2px solid var(--button-border);
-  background: #222;
+  border: 2px solid var(--input-border);
+  background: var(--input-bg);
   color: var(--text-color);
   font-size: var(--font-size);
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
 textarea {
@@ -108,10 +134,18 @@ label {
 /* Dropdown Styling */
 select {
   appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5H7z"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5H7z"/></svg>');
   background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 15px;
+  background-position: right 10px center;
+  background-size: 12px;
+  padding-right: 30px; /* Space for the arrow */
+  transition: border-color 0.3s ease;
+}
+
+select:hover,
+select:focus {
+  border-color: var(--button-hover-bg); /* Highlight on hover/focus */
+  outline: none;
 }
 
 /* Modal Styling */
@@ -156,17 +190,31 @@ select {
   gap: 10px;
 }
 
-#categoryFilter {
-  width: 50%;
+/* Error Message Styling */
+.modal-error,
+.new-category-error {
+  display: none;
+  background: var(--error-bg);
+  color: var(--error-text);
+  padding: 8px;
+  border-radius: var(--border-radius);
+  margin: 10px 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.new-category-error {
+  text-align: left;
+  margin: 5px 0 10px 0;
 }
 
 /* New Category Box Styling */
 #new-category-box {
   display: none;
   margin-top: 10px;
-  margin-bottom: 15px; /* Extra spacing to separate from the next field */
+  margin-bottom: 15px;
   padding: 10px;
-  background: #252525; /* Subtle background to distinguish the section */
+  background: #252525;
   border-radius: var(--border-radius);
 }
 
@@ -176,8 +224,8 @@ select {
   margin: 0 0 10px 0;
   padding: 10px;
   border-radius: var(--border-radius);
-  border: 2px solid var(--button-border);
-  background: #222;
+  border: 2px solid var(--input-border);
+  background: var(--input-bg);
   color: var(--text-color);
   font-size: var(--font-size);
 }
@@ -186,7 +234,7 @@ select {
 .new-category-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px; /* Matches modal-footer gap */
+  gap: 10px;
 }
 
 /* Save and Cancel New Category Button Styling */

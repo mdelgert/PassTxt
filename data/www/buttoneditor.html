@@ -29,6 +29,7 @@
           <h2 id="modalTitle">Edit Button</h2>
           <button id="closeModal">X</button>
         </div>
+        <div class="modal-error" id="modalError"></div> <!-- General error message -->
         <div class="modal-body">
           <input type="text" id="editName" placeholder="Button Label" required>
           <label for="editCategory">Category</label>
@@ -36,6 +37,7 @@
           <!-- Add New Category Input -->
           <div id="new-category-box">
             <input type="text" id="new-category-name" placeholder="New category name" />
+            <div class="new-category-error" id="newCategoryError"></div> <!-- Category-specific error -->
             <div class="new-category-actions">
               <button id="save-new-category">Save</button>
               <button id="cancel-new-category">Cancel</button>

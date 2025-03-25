@@ -1,6 +1,6 @@
-//buttoneditor.js
+// buttoneditor.js
 
-import {BASE_URL} from './config.js';
+import { BASE_URL } from './config.js';
 
 const endPoint = BASE_URL;
 const token = "test";
@@ -8,7 +8,7 @@ const token = "test";
 let items = [];
 let editingItemId = null;
 let categories = [];
-let previousCategory = null; // Store the previously selected category
+let previousCategoryId = null;
 
 const fetchCategories = async () => {
   try {
@@ -20,11 +20,11 @@ const fetchCategories = async () => {
       categories = data.categories || [];
       return categories;
     } else {
-      console.error("Failed to fetch categories");
-      return [];
+      throw new Error("Failed to fetch categories");
     }
   } catch (err) {
     console.error("Error fetching categories:", err);
+    showModalError("Failed to load categories. Please try again.");
     return [];
   }
 };
@@ -37,26 +37,34 @@ const fetchButtons = async () => {
       items = data.buttons || [];
       renderList();
     } else {
-      console.error("Failed to fetch buttons");
+      throw new Error("Failed to fetch buttons");
     }
   } catch (err) {
     console.error("Error fetching buttons:", err);
+    showModalError("Failed to load buttons. Please try again.");
   }
 };
 
+// Helper function to get category name by ID
+function getCategoryNameById(id) {
+  const category = categories.find(cat => cat.id === id);
+  return category ? category.name : "Unknown";
+}
+
 function populateCategoryFilter(categoryFilter, buttons) {
   categoryFilter.innerHTML = '<option value="all">All</option>';
-  const categorySet = new Set(buttons.map(button => button.category));
-  categorySet.forEach(category => {
+  const categorySet = new Set(buttons.map(button => button.categoryId));
+  categorySet.forEach(categoryId => {
+    const categoryName = getCategoryNameById(categoryId);
     const option = document.createElement("option");
-    option.value = category;
-    option.textContent = category;
+    option.value = categoryId;
+    option.textContent = categoryName;
     categoryFilter.appendChild(option);
   });
 
   categoryFilter.addEventListener("change", () => {
-    const selectedCategory = categoryFilter.value;
-    const filteredButtons = selectedCategory === "all" ? items : items.filter(button => button.category === selectedCategory);
+    const selectedCategoryId = categoryFilter.value;
+    const filteredButtons = selectedCategoryId === "all" ? items : items.filter(button => button.categoryId === parseInt(selectedCategoryId));
     renderList(filteredButtons);
   });
 }
@@ -65,7 +73,7 @@ function populateEditCategory(editCategory, newCategoryBox) {
   editCategory.innerHTML = "";
   categories.forEach(cat => {
     const option = document.createElement("option");
-    option.value = cat.name;
+    option.value = cat.id; // Use ID as the value
     option.textContent = cat.name;
     editCategory.appendChild(option);
   });
@@ -82,18 +90,53 @@ function populateEditCategory(editCategory, newCategoryBox) {
 
   editCategory.addEventListener("change", () => {
     if (editCategory.value === "add-new") {
-      previousCategory = editCategory.value; // Store the current selection before switching
+      previousCategoryId = editCategory.value;
       newCategoryBox.style.display = "block";
     } else {
-      previousCategory = editCategory.value; // Update the previous selection
+      previousCategoryId = editCategory.value;
       newCategoryBox.style.display = "none";
+      clearNewCategoryError(); // Clear error when changing selection
     }
   });
 }
 
+function showModalError(message) {
+  const modalError = document.getElementById("modalError");
+  modalError.textContent = message;
+  modalError.style.display = "block";
+}
+
+function clearModalError() {
+  const modalError = document.getElementById("modalError");
+  modalError.textContent = "";
+  modalError.style.display = "none";
+}
+
+function showNewCategoryError(message) {
+  const newCategoryError = document.getElementById("newCategoryError");
+  newCategoryError.textContent = message;
+  newCategoryError.style.display = "block";
+}
+
+function clearNewCategoryError() {
+  const newCategoryError = document.getElementById("newCategoryError");
+  newCategoryError.textContent = "";
+  newCategoryError.style.display = "none";
+}
+
 async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput) {
   const name = newCategoryNameInput.value.trim();
-  if (!name) return alert("Enter a category name");
+  if (!name) {
+    showNewCategoryError("Enter a category name");
+    return;
+  }
+
+  // Check for duplicate category name (case-insensitive)
+  const duplicate = categories.some(cat => cat.name.toLowerCase() === name.toLowerCase());
+  if (duplicate) {
+    showNewCategoryError("A category with this name already exists.");
+    return;
+  }
 
   try {
     const res = await fetch(`${endPoint}/categories`, {
@@ -105,18 +148,23 @@ async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInpu
       body: JSON.stringify({ categories: [{ name }] })
     });
 
+    if (!res.ok) {
+      throw new Error("Failed to save category");
+    }
+
     const data = await res.json();
     const newCat = data.categories?.[0];
     if (!newCat) throw new Error("No category returned");
 
     await fetchCategories();
     populateEditCategory(editCategory, newCategoryBox);
-    editCategory.value = newCat.name;
+    editCategory.value = newCat.id;
 
     newCategoryBox.style.display = "none";
     newCategoryNameInput.value = "";
+    clearNewCategoryError();
   } catch (err) {
-    alert("Failed to save category");
+    showNewCategoryError("Failed to save category. Please try again.");
     console.error(err);
   }
 }
@@ -124,7 +172,8 @@ async function saveNewCategory(editCategory, newCategoryBox, newCategoryNameInpu
 function cancelNewCategory(editCategory, newCategoryBox, newCategoryNameInput) {
   newCategoryBox.style.display = "none";
   newCategoryNameInput.value = "";
-  editCategory.value = previousCategory && previousCategory !== "add-new" ? previousCategory : categories[0]?.name || ""; // Reset to previous or first category
+  editCategory.value = previousCategoryId && previousCategoryId !== "add-new" ? previousCategoryId : categories[0]?.id || "";
+  clearNewCategoryError();
 }
 
 function renderList(filteredItems = items) {
@@ -175,8 +224,8 @@ function openModal(id) {
   editingItemId = id;
   const item = items.find((i) => i.id === id);
   document.getElementById("editName").value = item.name;
-  document.getElementById("editCategory").value = item.category;
-  previousCategory = item.category; // Store the initial category
+  document.getElementById("editCategory").value = item.categoryId;
+  previousCategoryId = item.categoryId;
   document.getElementById("editAction").value = item.action;
   document.getElementById("editCommand").value = item.command || "";
   document.getElementById("editUserName").value = item.userName || "";
@@ -185,13 +234,15 @@ function openModal(id) {
   document.getElementById("modalTitle").textContent = "Edit Button";
   document.getElementById("editModal").style.display = "flex";
   document.getElementById("new-category-box").style.display = "none";
+  clearModalError();
+  clearNewCategoryError();
 }
 
 function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
-  document.getElementById("editCategory").value = categories[0]?.name || "";
-  previousCategory = categories[0]?.name || ""; // Store the initial category
+  document.getElementById("editCategory").value = categories[0]?.id || "";
+  previousCategoryId = categories[0]?.id || "";
   document.getElementById("editAction").value = "Command";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
@@ -200,29 +251,43 @@ function openModalForAdd() {
   document.getElementById("modalTitle").textContent = "Add New Button";
   document.getElementById("editModal").style.display = "flex";
   document.getElementById("new-category-box").style.display = "none";
+  clearModalError();
+  clearNewCategoryError();
 }
 
 function closeModal() {
   document.getElementById("editModal").style.display = "none";
   document.getElementById("new-category-box").style.display = "none";
+  clearModalError();
+  clearNewCategoryError();
 }
 
 async function saveChanges() {
   const name = document.getElementById("editName").value;
-  const category = document.getElementById("editCategory").value;
+  const categoryId = document.getElementById("editCategory").value;
   const action = document.getElementById("editAction").value;
   const command = document.getElementById("editCommand").value;
   const userName = document.getElementById("editUserName").value;
   const password = document.getElementById("editPassword").value;
   const notes = document.getElementById("editNotes").value;
-  if (!name || !command) return;
-  if (category === "add-new") return alert("Please save or select a valid category");
-  
+
+  if (!name) {
+    showModalError("Button label is required.");
+    return;
+  }
+  if (!command) {
+    showModalError("Command is required.");
+    return;
+  }
+  if (categoryId === "add-new") {
+    showModalError("Please save or select a valid category.");
+    return;
+  }
+
   const button = { 
-    //id: editingItemId || Date.now(),
     id: editingItemId || null,
     name,
-    category, 
+    categoryId: parseInt(categoryId),
     action,
     command,
     userName,
@@ -236,29 +301,29 @@ async function saveChanges() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ buttons: [button] }),
     });
-    
-    if (response.ok) {
-      await fetchButtons();
-      closeModal();
-    } else {
-      console.error("Failed to save button");
+
+    if (!response.ok) {
+      throw new Error("Failed to save button");
     }
+
+    await fetchButtons();
+    closeModal();
   } catch (err) {
+    showModalError("Failed to save button. Please try again.");
     console.error("Error saving button:", err);
   }
 }
 
 async function deleteItem(id) {
-  //if (!confirm("Are you sure you want to delete this item?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (response.ok) {
-      await fetchButtons();
-    } else {
-      console.error("Failed to delete button");
+    if (!response.ok) {
+      throw new Error("Failed to delete button");
     }
+    await fetchButtons();
   } catch (err) {
     console.error("Error deleting button:", err);
+    showModalError("Failed to delete button. Please try again.");
   }
 }
 
