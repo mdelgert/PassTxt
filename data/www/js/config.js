@@ -2,7 +2,7 @@
 console.log("config.js loaded");
 
 // Centralized device configuration
-const DEV_DEVICE = "passtxt1.local";
+const DEV_DEVICE = "passtxt4.local";
 //const DEV_DEVICE = "demo1.local";
 //const DEV_DEVICE = "demo2.local";
 

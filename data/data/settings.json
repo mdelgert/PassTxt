@@ -1,6 +1,6 @@
 {
     "device": {
-      "name": "passtxt1",
+      "name": "passtxt",
       "setupMode": false,
       "timezone": "America/New_York",
       "defaultTimeout": 500,

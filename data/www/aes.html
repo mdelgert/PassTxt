@@ -6,67 +6,53 @@
   <title>AES Encryption & Decryption (ChatGPT-style Dark Theme)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
   <link rel="stylesheet" href="/css/aes.css" />
-  <style></style>
 </head>
 <body>
   <div class="container">
     <h2>AES Encryption</h2>
-    
     <label for="textToEncrypt">Text to encrypt:</label>
     <input type="text" id="textToEncrypt" placeholder="Enter text to encrypt" />
-    
     <label for="encryptionKey">Encryption Key (Password):</label>
     <input type="text" id="encryptionKey" placeholder="Enter key for encryption" />
-    
-    <button onclick="encrypt()">Encrypt</button>
-    <button onclick="decrypt()">Decrypt</button>
-    
+    <button onclick="handleEncrypt()">Encrypt</button>
+    <button onclick="handleDecrypt()">Decrypt</button>
     <h3>Encrypted Text (Base64):</h3>
     <textarea id="encryptedOutput" rows="4"></textarea>
-    
     <h3>Decrypted Text:</h3>
     <textarea id="decryptedOutput" rows="4"></textarea>
   </div>
-
   <script>
-
-  function encrypt() {
-      const textToEncrypt = document.getElementById('textToEncrypt').value;
-      const encryptionKey = document.getElementById('encryptionKey').value;
-      if (!textToEncrypt || !encryptionKey) {
-          alert("Please enter both text and a key.");
-          return;
+    // Reusable encrypt function with password as first parameter
+    function encrypt(password, text) {
+      if (!password || !text) {
+        throw new Error("Password and text are required for encryption.");
       }
-
+      
       // Derive a 32-byte key using SHA-256
-      const key = CryptoJS.SHA256(encryptionKey);
+      const key = CryptoJS.SHA256(password);
 
       // Generate a random IV (16 bytes for AES-256 CBC)
       const iv = CryptoJS.lib.WordArray.random(16);
 
       // Encrypt using AES-CBC with Pkcs7 padding
-      const encrypted = CryptoJS.AES.encrypt(textToEncrypt, key, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
+      const encrypted = CryptoJS.AES.encrypt(text, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
       });
 
       // Prepend IV to ciphertext and Base64 encode
-      const encryptedBase64 = CryptoJS.enc.Base64.stringify(iv.concat(encrypted.ciphertext));
+      return CryptoJS.enc.Base64.stringify(iv.concat(encrypted.ciphertext));
+    }
 
-      document.getElementById('encryptedOutput').value = encryptedBase64;
-  }
-
-  function decrypt() {
-      const encryptedBase64 = document.getElementById('encryptedOutput').value;
-      const encryptionKey = document.getElementById('encryptionKey').value;
-      if (!encryptedBase64 || !encryptionKey) {
-          alert("Please enter both encrypted text and the encryption key.");
-          return;
+    // Reusable decrypt function with password as first parameter
+    function decrypt(password, encryptedBase64) {
+      if (!password || !encryptedBase64) {
+        throw new Error("Password and encrypted text are required for decryption.");
       }
 
       // Derive a 32-byte key using SHA-256
-      const key = CryptoJS.SHA256(encryptionKey);
+      const key = CryptoJS.SHA256(password);
 
       // Decode Base64 and extract IV (first 16 bytes) and ciphertext
       const encryptedRaw = CryptoJS.enc.Base64.parse(encryptedBase64);
@@ -75,13 +61,44 @@
 
       // Decrypt using AES-CBC
       const decrypted = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, key, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
       });
 
-      document.getElementById('decryptedOutput').value = decrypted.toString(CryptoJS.enc.Utf8);
-  }
+      return decrypted.toString(CryptoJS.enc.Utf8);
+    }
+
+    // Event handlers for UI
+    function handleEncrypt() {
+      const textToEncrypt = document.getElementById('textToEncrypt').value;
+      const encryptionKey = document.getElementById('encryptionKey').value;
+      try {
+        const encryptedText = encrypt(encryptionKey, textToEncrypt);
+        document.getElementById('encryptedOutput').value = encryptedText;
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function handleDecrypt() {
+      const encryptedBase64 = document.getElementById('encryptedOutput').value;
+      const encryptionKey = document.getElementById('encryptionKey').value;
+      try {
+        const decryptedText = decrypt(encryptionKey, encryptedBase64);
+        document.getElementById('decryptedOutput').value = decryptedText;
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    // Example of using encrypt/decrypt elsewhere
+    // const myPassword = "secret123";
+    // const myText = "Hello, World!";
+    // const encrypted = encrypt(myPassword, myText);
+    // console.log("Encrypted:", encrypted);
+    // const decrypted = decrypt(myPassword, encrypted);
+    // console.log("Decrypted:", decrypted);
   </script>
 </body>
 </html>
