@@ -5,30 +5,79 @@
 #include "WebHandler.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include "CryptoHandler.h"
 
 void ServeButtons::registerEndpoints(AsyncWebServer &server)
 {
     server.on("/buttons", HTTP_GET, handleGetButtons);
-    server.on("/buttons", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, handlePostButtons);
     server.on("/buttons", HTTP_DELETE, handleDeleteButton);
+    server.on("/buttons", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, handlePostButtons);
 }
 
 void ServeButtons::handleGetButtons(AsyncWebServerRequest *request)
 {
-    // Open the file for reading
     File file = LittleFS.open(BUTTONS_FILE, "r");
     if (!file || file.size() == 0) {
-        WebHandler::sendErrorResponse(request, 400, "Failed to read buttons2.json or file is empty");
+        WebHandler::sendErrorResponse(request, 400, "Failed to read %s", BUTTONS_FILE);
         return;
     }
 
-    String json = file.readString(); // Read the file content into a string
-    file.close(); // Close the file
+    String json = file.readString();
+    file.close();
 
-    //request->send(200, "application/json", json); // Send the file content as JSON
     AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", json);
     WebHandler::addCorsHeaders(response);
     request->send(response);
+}
+
+void ServeButtons::handleDeleteButton(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("id")) {
+        WebHandler::sendErrorResponse(request, 400, "Missing button ID");
+        return;
+    }
+
+    String buttonId = request->getParam("id")->value();
+    File file = LittleFS.open(BUTTONS_FILE, "r");
+    if (!file) {
+        WebHandler::sendErrorResponse(request, 500, "Failed to read %s", BUTTONS_FILE);
+        return;
+    }
+
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    file.close();
+
+    if (error) {
+        WebHandler::sendErrorResponse(request, 500, "Invalid JSON format in %s", BUTTONS_FILE);
+        return;
+    }
+
+    JsonArray buttons = doc["buttons"];
+    bool buttonFound = false;
+
+    for (size_t i = 0; i < buttons.size(); i++) {
+        if (String(buttons[i]["id"].as<String>()) == buttonId) {
+            buttons.remove(i);
+            buttonFound = true;
+            break;
+        }
+    }
+
+    if (!buttonFound) {
+        WebHandler::sendErrorResponse(request, 404, "Button ID not found");
+        return;
+    }
+
+    file = LittleFS.open(BUTTONS_FILE, "w");
+    if (!file) {
+        WebHandler::sendErrorResponse(request, 500, "Failed to write %s", BUTTONS_FILE);
+        return;
+    }
+
+    serializeJsonPretty(doc, file);
+    file.close();
+    WebHandler::sendSuccessResponse(request, "Button deleted successfully");
 }
 
 void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
@@ -63,7 +112,14 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
     JsonDocument existingDoc;
     
     if (file) {
-        deserializeJson(existingDoc, file); // Deserialize existing data
+        debugV("Opened existing file for reading: %s", BUTTONS_FILE);
+        DeserializationError readError = deserializeJson(existingDoc, file);
+        if (readError) {
+            debugE("Failed to deserialize existing JSON: %s", readError.c_str());
+            file.close();
+            WebHandler::sendErrorResponse(request, 500, "Failed to read existing %s", BUTTONS_FILE);
+            return;
+        }
         file.close();
     } else {
         debugW("No existing file found; initializing new document");
@@ -72,16 +128,33 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
 
     JsonArray existingButtons = existingDoc["buttons"];
     JsonArray incomingButtons = incomingDoc["buttons"];
-
+    
     // Update existing buttons or add new ones
     for (JsonObject newButton : incomingButtons) {
         bool found = false;
 
         for (JsonObject existingButton : existingButtons) {
             if (existingButton["id"] == newButton["id"]) {
-                // Update only the provided fields for the matching button
+                debugV("Found button with ID: %d", existingButton["id"].as<int>());
+                // Update only non-password fields, preserve existing password unless explicitly updating with plaintext
                 for (JsonPair kv : newButton) {
-                    existingButton[kv.key()] = kv.value();
+                    if (kv.key() == "userPassword") {
+                        // Only process password if explicitly marked as plaintext (e.g., via a flag or assumption)
+                        // For now, assume encrypted passwords are sent as-is and skip decryption
+                        if (kv.value().is<String>()) {
+                            String newPassword = kv.value().as<String>();
+                            if (!newPassword.isEmpty()) {
+                                debugV("Preserving or updating userPassword as-is for ID: %d", existingButton["id"].as<int>());
+                                existingButton["userPassword"] = newPassword; // Store as-is (encrypted)
+                            } else {
+                                debugV("Empty password skipped for ID: %d", existingButton["id"].as<int>());
+                                continue; // Preserve existing password
+                            }
+                        }
+                    } else {
+                        debugV("Updating field '%s' to '%s' for ID: %d", kv.key().c_str(), kv.value().as<String>().c_str(), existingButton["id"].as<int>());
+                        existingButton[kv.key()] = kv.value();
+                    }
                 }
                 found = true;
                 break;
@@ -89,7 +162,7 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
         }
 
         if (!found) {
-            // Generate a new ID
+            debugV("Creating new button");
             int maxId = 0;
             for (JsonObject existingButton : existingButtons) {
                 int existingId = existingButton["id"] | 0;
@@ -100,91 +173,41 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
             
             int newId = maxId + 1;
             
-            // Assign a new ID if it's missing or 0
             JsonObject buttonToAdd = newButton;
             if (buttonToAdd["id"].isNull() || buttonToAdd["id"] == 0) {
                 buttonToAdd["id"] = newId;
+                if (buttonToAdd["userPassword"].is<String>()) {
+                    String plainPassword = buttonToAdd["userPassword"].as<String>();
+                    if (!plainPassword.isEmpty()) {
+                        debugV("Encrypting password for new button ID: %d", newId);
+                        String encryptedPassword = CryptoHandler::encryptAES(plainPassword, settings.device.userPassword);
+                        buttonToAdd["userPassword"] = encryptedPassword;
+                    } else {
+                        debugV("Empty password removed for new button ID: %d", newId);
+                        buttonToAdd.remove("userPassword");
+                    }
+                }
             }
-
-            // Add new button
             existingButtons.add(buttonToAdd);
+            debugV("Added new button with ID: %d", newId);
         }
     }
 
     // Write the updated JSON back to the file
+    debugV("Attempting to write updated JSON to %s", BUTTONS_FILE);
     file = LittleFS.open(BUTTONS_FILE, "w");
     if (!file) {
         debugE("Failed to open file for writing: %s", BUTTONS_FILE);
-        WebHandler::sendErrorResponse(request, 500, "Failed to write buttons2.json");
+        WebHandler::sendErrorResponse(request, 500, "Failed to write %s", BUTTONS_FILE);
         return;
     }
 
-    serializeJsonPretty(existingDoc, file); // Save updated JSON
+    debugV("Serializing updated JSON");
+    serializeJsonPretty(existingDoc, file);
+    debugV("Closing file after write");
     file.close();
+    debugV("File write successful");
     WebHandler::sendSuccessResponse(request, "Buttons updated successfully");
-}
-
-void ServeButtons::handleDeleteButton(AsyncWebServerRequest *request)
-{
-    // Check if the "id" parameter is provided
-    if (!request->hasParam("id")) {
-        WebHandler::sendErrorResponse(request, 400, "Missing button ID");
-        return;
-    }
-
-    String buttonId = request->getParam("id")->value(); // Use String instead of int
-    debugV("Attempting to delete button with ID: %s", buttonId.c_str());
-
-    // Open the JSON file for reading
-    File file = LittleFS.open(BUTTONS_FILE, "r");
-    if (!file) {
-        debugE("Failed to open file for reading: %s", BUTTONS_FILE);
-        WebHandler::sendErrorResponse(request, 500, "Failed to read buttons2.json");
-        return;
-    }
-
-    // Parse the JSON content
-    JsonDocument doc; // Adjust size as needed
-    DeserializationError error = deserializeJson(doc, file);
-    file.close();
-
-    if (error) {
-        debugE("Failed to parse JSON file: %s", error.c_str());
-        WebHandler::sendErrorResponse(request, 500, "Invalid JSON format in buttons2.json");
-        return;
-    }
-
-    JsonArray buttons = doc["buttons"];
-    bool buttonFound = false;
-
-    // Iterate over the buttons array and remove the one with the matching ID
-    for (size_t i = 0; i < buttons.size(); i++) {
-        if (String(buttons[i]["id"].as<String>()) == buttonId) { // Compare as strings
-            buttons.remove(i);
-            buttonFound = true;
-            break;
-        }
-    }
-
-    if (!buttonFound) {
-        debugW("Button with ID %s not found", buttonId.c_str());
-        WebHandler::sendErrorResponse(request, 404, "Button ID not found");
-        return;
-    }
-
-    // Write the updated JSON back to the file
-    file = LittleFS.open(BUTTONS_FILE, "w");
-    if (!file) {
-        debugE("Failed to open file for writing: %s", BUTTONS_FILE);
-        WebHandler::sendErrorResponse(request, 500, "Failed to write buttons2.json");
-        return;
-    }
-
-    serializeJsonPretty(doc, file); // Save updated JSON
-    file.close();
-
-    debugV("Button with ID %s deleted successfully", buttonId.c_str());
-    WebHandler::sendSuccessResponse(request, "Button deleted successfully");
 }
 
 #endif // ENABLE_WEB_HANDLER

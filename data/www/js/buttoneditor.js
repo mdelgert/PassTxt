@@ -227,7 +227,7 @@ function openModal(id) {
   document.getElementById("editAction").value = item.action;
   document.getElementById("editCommand").value = item.command || "";
   document.getElementById("editUserName").value = item.userName || "";
-  document.getElementById("editPassword").value = item.password || "";
+  document.getElementById("editUserPassword").value = item.userPassword || "";
   document.getElementById("editNotes").value = item.notes || "";
   document.getElementById("modalTitle").textContent = "Edit Button";
   document.getElementById("editModal").style.display = "flex";
@@ -244,7 +244,7 @@ function openModalForAdd() {
   document.getElementById("editAction").value = "Command";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
-  document.getElementById("editPassword").value = "";
+  document.getElementById("editUserPassword").value = "";
   document.getElementById("editNotes").value = "";
   document.getElementById("modalTitle").textContent = "Add New Button";
   document.getElementById("editModal").style.display = "flex";
@@ -266,17 +266,19 @@ async function saveChanges() {
   const action = document.getElementById("editAction").value;
   const command = document.getElementById("editCommand").value;
   const userName = document.getElementById("editUserName").value;
-  const password = document.getElementById("editPassword").value;
+  const userPassword = document.getElementById("editUserPassword").value;
   const notes = document.getElementById("editNotes").value;
 
   if (!name) {
     showModalError("Button label is required.");
     return;
   }
-  if (!command) {
-    showModalError("Command is required.");
-    return;
-  }
+  
+  // if (!command) {
+  //   showModalError("Command is required.");
+  //   return;
+  // }
+
   if (categoryId === "add-new") {
     showModalError("Please save or select a valid category.");
     return;
@@ -289,7 +291,7 @@ async function saveChanges() {
     action,
     command,
     userName,
-    password, 
+    userPassword, 
     notes
   };
 
