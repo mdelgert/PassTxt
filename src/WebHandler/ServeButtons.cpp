@@ -117,7 +117,7 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
         if (readError) {
             debugE("Failed to deserialize existing JSON: %s", readError.c_str());
             file.close();
-            WebHandler::sendErrorResponse(request, 500, "Failed to read existing %s", BUTTONS_FILE);
+            WebHandler::sendErrorResponse(request, 500, "Failed to read existing buttons2.json");
             return;
         }
         file.close();
@@ -136,19 +136,29 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
         for (JsonObject existingButton : existingButtons) {
             if (existingButton["id"] == newButton["id"]) {
                 debugV("Found button with ID: %d", existingButton["id"].as<int>());
-                // Update only non-password fields, preserve existing password unless explicitly updating with plaintext
+                // Update only the provided fields, encrypting new passwords if none existed
                 for (JsonPair kv : newButton) {
                     if (kv.key() == "userPassword") {
-                        // Only process password if explicitly marked as plaintext (e.g., via a flag or assumption)
-                        // For now, assume encrypted passwords are sent as-is and skip decryption
                         if (kv.value().is<String>()) {
                             String newPassword = kv.value().as<String>();
                             if (!newPassword.isEmpty()) {
-                                debugV("Preserving or updating userPassword as-is for ID: %d", existingButton["id"].as<int>());
-                                existingButton["userPassword"] = newPassword; // Store as-is (encrypted)
+                                // Check if password exists in existing button
+                                if (!existingButton["userPassword"].is<String>() || existingButton["userPassword"].as<String>().isEmpty()) {
+                                    // No prior password; treat as plaintext and encrypt
+                                    debugV("No prior password for ID: %d; encrypting new password", existingButton["id"].as<int>());
+                                    String encryptedPassword = CryptoHandler::encryptAES(newPassword, settings.device.userPassword);
+                                    existingButton["userPassword"] = encryptedPassword;
+                                } else {
+                                    // Password exists; assume incoming is encrypted and store as-is
+                                    debugV("Existing password for ID: %d; storing new password as-is", existingButton["id"].as<int>());
+                                    existingButton["userPassword"] = newPassword;
+                                }
                             } else {
-                                debugV("Empty password skipped for ID: %d", existingButton["id"].as<int>());
-                                continue; // Preserve existing password
+                                debugV("Empty password skipped for ID: %d; removing if no prior password", existingButton["id"].as<int>());
+                                if (!existingButton["userPassword"].is<String>() || existingButton["userPassword"].as<String>().isEmpty()) {
+                                    existingButton.remove("userPassword");
+                                }
+                                // Otherwise, preserve existing password
                             }
                         }
                     } else {
@@ -198,7 +208,7 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
     file = LittleFS.open(BUTTONS_FILE, "w");
     if (!file) {
         debugE("Failed to open file for writing: %s", BUTTONS_FILE);
-        WebHandler::sendErrorResponse(request, 500, "Failed to write %s", BUTTONS_FILE);
+        WebHandler::sendErrorResponse(request, 500, "Failed to write buttons2.json");
         return;
     }
 
