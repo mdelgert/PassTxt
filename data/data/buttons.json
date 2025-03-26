@@ -2,10 +2,10 @@
   "buttons": [
     {
       "id": 1,
-      "name": "CALC",
+      "name": "CMD",
       "categoryId": 1,
       "action": "Command",
-      "command": "DUCKY FILE /scripts/calc.txt",
+      "command": "DUCKY FILE /scripts/cmd1.txt",
       "notes": ""
     },
     {
@@ -150,6 +150,14 @@
       "categoryId": 2,
       "action": "Command",
       "command": "script file /scripts/lockwindows.txt",
+      "notes": ""
+    },
+    {
+      "id": 20,
+      "name": "CALC",
+      "categoryId": 1,
+      "action": "Command",
+      "command": "DUCKY FILE /scripts/calc.txt",
       "notes": ""
     }
   ]

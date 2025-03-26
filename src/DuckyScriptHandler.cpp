@@ -115,6 +115,21 @@ void DuckyScriptHandler::processLine(const String &line)
         }
         return;
     }
+    
+    // Allows sending raw commands to the CommandHandler
+    if (CommandHandler::equalsIgnoreCase(command, "COMMAND"))
+    {
+        if (!args.isEmpty()) 
+        {
+            debugI("Sending COMMAND: %s", args.c_str());
+            CommandHandler::handleCommand(args);
+        } 
+        else 
+        {
+            debugE("COMMAND command missing argument");
+        }
+        return;
+    }
 
     if (CommandHandler::equalsIgnoreCase(command, "ENTER"))
     {
