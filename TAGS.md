@@ -33,6 +33,6 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 - Cleanup categories
 
 ### Tag: v1.0.3
-**Date:** TODO
-**Description:**  
--
+**Date:** 2025-26-03
+**Description:**
+- Add encrypted passwords
