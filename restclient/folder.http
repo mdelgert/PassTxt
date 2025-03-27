@@ -1,4 +1,4 @@
-@baseUrl = http://demo1.local
+@baseUrl = http://passtxt4.local
 @token = test
 
 ### Get all folders

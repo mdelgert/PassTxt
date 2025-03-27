@@ -548,6 +548,47 @@ void ServeFiles::handleDeleteFile(AsyncWebServerRequest *request)
     }
 }
 
+// This may be repeated code TODO: Refactor and cleanup later
+
+// Recursive helper to list files in a folder and its subfolders
+void ServeFiles::listFilesRecursiveInFolder(JsonArray &files, const String &basePath, const String &currentPath)
+{
+    String dirPath = currentPath.isEmpty() ? basePath : currentPath;
+    if (!dirPath.endsWith("/"))
+    {
+        dirPath += "/";
+    }
+
+    debugV("Opening directory: %s", dirPath.c_str());
+    File dir = LittleFS.open(dirPath);
+
+    if (!dir || !dir.isDirectory())
+    {
+        debugE("Failed to open directory: %s", dirPath.c_str());
+        return;
+    }
+
+    File file = dir.openNextFile();
+    while (file)
+    {
+        String fullPath = dirPath + file.name();
+        String relativePath = fullPath.substring(basePath.length()); // Relative to the base path
+
+        if (file.isDirectory())
+        {
+            debugV("Entering subdirectory: %s", fullPath.c_str());
+            listFilesRecursiveInFolder(files, basePath, fullPath); // Recurse into subfolder
+        }
+        else
+        {
+            debugV("Found file: %s", fullPath.c_str());
+            files.add(relativePath); // Add file with path relative to the base folder
+        }
+        file = dir.openNextFile();
+    }
+}
+
+// Handler for `/folder/files` with subfolder support
 void ServeFiles::handleListFilesInFolder(AsyncWebServerRequest *request)
 {
     String path = "/";
@@ -560,7 +601,7 @@ void ServeFiles::handleListFilesInFolder(AsyncWebServerRequest *request)
         path += "/";
     }
 
-    debugV("Received request to list files in folder: %s", path.c_str());
+    debugV("Received request to list files in folder (with subfolders): %s", path.c_str());
 
     File dir = LittleFS.open(path);
     if (!dir || !dir.isDirectory())
@@ -573,25 +614,11 @@ void ServeFiles::handleListFilesInFolder(AsyncWebServerRequest *request)
     JsonDocument doc;
     JsonArray files = doc["files"].to<JsonArray>();
 
-    // List only files in the specified folder (non-recursive)
-    File file = dir.openNextFile();
-    while (file)
-    {
-        String name = file.name();
-        if (name.startsWith(path))
-        {
-            name = name.substring(path.length());
-        }
-        if (!file.isDirectory()) // Only include files, not folders
-        {
-            debugV("Found file: %s", name.c_str());
-            files.add(name);
-        }
-        file = dir.openNextFile();
-    }
+    // List files recursively starting from the specified path
+    listFilesRecursiveInFolder(files, path, path);
 
     doc["path"] = path;
-    WebHandler::sendSuccessResponse(request, "Files in folder listed successfully", &doc);
+    WebHandler::sendSuccessResponse(request, "Files in folder and subfolders listed successfully", &doc);
 }
 
 #endif // ENABLE_WEB_HANDLER
