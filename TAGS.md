@@ -36,3 +36,9 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Date:** 2025-26-03
 **Description:**
 - Add encrypted passwords
+
+### Tag: v1.0.4
+**Date:** 2025-26-03
+**Description:**
+- Mqtt cleanup
+- Add exponential back off

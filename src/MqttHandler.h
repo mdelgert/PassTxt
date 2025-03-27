@@ -1,33 +1,30 @@
-// MqttHandler.h
-
 #pragma once
+
+#include "Globals.h"  // Assuming this is the correct header
 
 #ifdef ENABLE_MQTT_HANDLER
 
-#include "Globals.h"
+class MqttHandler {
+ public:
+  static void init();
+  static void loop();
+  static void publish(const char* topic, const char* message);
 
-class MqttHandler
-{
-private:
-    static void connectToMqtt();
-    static void mqttCallback(char* topic, byte* payload, unsigned int length);
-    static void registerCommands();
-
-public:
-    static void init();
-    static void loop();
-    static void publish(const char* topic, const char* message);
+ private:
+  static void connectToMqtt();
+  static void handleMqttCallback(char* topic, uint8_t* payload, uint32_t length);
+  static void registerCommands();
+  static bool loadCertificate(String& certContent);
 };
 
 #else
 
-// No-op implementation if MQTT_HANDLER is not enabled
-class MqttHandler
-{
-public:
-    static void init() {}
-    static void loop() {}
-    static void publish(const char* topic, const char* message) {}
+// No-op implementation when MQTT is disabled
+class MqttHandler {
+ public:
+  static void init() {}
+  static void loop() {}
+  static void publish(const char* topic, const char* message) {}
 };
 
-#endif // ENABLE_MQTT_HANDLER
+#endif  // ENABLE_MQTT_HANDLER
