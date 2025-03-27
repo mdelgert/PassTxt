@@ -8,6 +8,13 @@ Content-Type: text/plain
 
 ###
 
+### Get all files in folder
+GET {{baseUrl}}/folder/files?path=/scripts
+Authorization: Bearer {{token}}
+Content-Type: text/plain
+
+###
+
 ### Create a new file
 POST {{baseUrl}}/file?filename=/hello1.txt
 Content-Type: text/plain

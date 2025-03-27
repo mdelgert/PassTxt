@@ -17,6 +17,7 @@ void ServeFiles::registerEndpoints(AsyncWebServer &server)
     server.on("/folders", HTTP_GET, handleListFolders);                                          // List folders
     server.on("/rename", HTTP_POST, handleRename);                                               // Rename file or folder
     server.on("/filemanager", HTTP_GET, handleFileManager);                                      // List files and folders together
+    server.on("/folder/files", HTTP_GET, handleListFilesInFolder);                               // New endpoint: List files in a folder
 }
 
 // Handler for `/filemanager`
@@ -545,6 +546,52 @@ void ServeFiles::handleDeleteFile(AsyncWebServerRequest *request)
         debugE("Failed to delete file: %s", filename.c_str());
         WebHandler::sendErrorResponse(request, 500, "Failed to delete file");
     }
+}
+
+void ServeFiles::handleListFilesInFolder(AsyncWebServerRequest *request)
+{
+    String path = "/";
+    if (request->hasParam("path"))
+    {
+        path = request->getParam("path")->value();
+    }
+    if (!path.endsWith("/"))
+    {
+        path += "/";
+    }
+
+    debugV("Received request to list files in folder: %s", path.c_str());
+
+    File dir = LittleFS.open(path);
+    if (!dir || !dir.isDirectory())
+    {
+        debugE("Failed to open directory: %s", path.c_str());
+        WebHandler::sendErrorResponse(request, 404, "Invalid directory path");
+        return;
+    }
+
+    JsonDocument doc;
+    JsonArray files = doc["files"].to<JsonArray>();
+
+    // List only files in the specified folder (non-recursive)
+    File file = dir.openNextFile();
+    while (file)
+    {
+        String name = file.name();
+        if (name.startsWith(path))
+        {
+            name = name.substring(path.length());
+        }
+        if (!file.isDirectory()) // Only include files, not folders
+        {
+            debugV("Found file: %s", name.c_str());
+            files.add(name);
+        }
+        file = dir.openNextFile();
+    }
+
+    doc["path"] = path;
+    WebHandler::sendSuccessResponse(request, "Files in folder listed successfully", &doc);
 }
 
 #endif // ENABLE_WEB_HANDLER

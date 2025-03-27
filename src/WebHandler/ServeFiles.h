@@ -27,6 +27,7 @@ private:
     static void handleWriteFile(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
     static bool isProtectedFile(const String &filename);
     static void handleDeleteFile(AsyncWebServerRequest *request);
+    static void handleListFilesInFolder(AsyncWebServerRequest *request);
 };
 
 #endif // ENABLE_WEB_HANDLER
