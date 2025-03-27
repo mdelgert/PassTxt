@@ -1,3 +1,5 @@
+// MqttHandler.cpp
+
 #ifdef ENABLE_MQTT_HANDLER
 
 #include "MqttHandler.h"
@@ -6,30 +8,21 @@
 #include <PubSubClient.h>
 #include <LittleFS.h>
 
-// Create MQTT client; the actual client depends on the SSL flag
+static NonBlockingTimer mqttTimer(60000);
 WiFiClient wiFiClient;
 WiFiClientSecure wiFiClientSecure;
 PubSubClient mqttClient;
 
-// Optional: Use a NonBlockingTimer to avoid continuously retrying in busy loops
-static NonBlockingTimer mqttTimer(60000);
-
 void MqttHandler::init()
 {
-    // if(!settings.mqttEnabled) {
-    //     debugI("MqttHandler: MQTT is disabled in settings.");
-    //     return;
-    // }
-
+    if(!settings.mqtt.enabled)return;
     registerCommands();
-
-    // Attempt initial connection
     connectToMqtt();
 }
 
 void MqttHandler::loop()
 {
-    //if(!settings.mqttEnabled) return;
+    if(!settings.mqtt.enabled) return;
     
     // If not connected, attempt to reconnect
     if (!mqttClient.connected())
@@ -37,6 +30,7 @@ void MqttHandler::loop()
         if (mqttTimer.isReady())
         {
             debugW("MqttHandler: Not connected, attempting reconnect...");
+            settings.mqtt.isConnected = false;
             connectToMqtt();
         }
     }
@@ -84,15 +78,12 @@ void MqttHandler::connectToMqtt()
 
         // Read the certificate content
         String certContent = certFile.readString();
-        
-        debugI("MqttHandler: Read %d bytes from certificate file.", certContent.length());
-        debugI("MqttHandler: Certificate content: %s", certContent.c_str());
+        debugV("MqttHandler: Read %d bytes from certificate file.", certContent.length());
+        debugV("MqttHandler: Certificate content: %s", certContent.c_str());
 
         // Close the certificate file
         certFile.close();
-
         wiFiClientSecure.setCACert(certContent.c_str());
-        // wiFiClientSecure.setCACert(ca_cert);
         mqttClient.setClient(wiFiClientSecure);
     }
     else
@@ -109,38 +100,27 @@ void MqttHandler::connectToMqtt()
 
     debugI("MqttHandler: Attempting MQTT connection to %s:%d", settings.mqtt.server.c_str(), settings.mqtt.port);
 
-    //bool isConnected = false;
-
-    // Attempt to connect to the MQTT broker
-    // If username/password are not empty, use them
+    // Attempt to connect to the MQTT broker if username/password are not empty, use them
     if (!settings.mqtt.username.isEmpty() || !settings.mqtt.password.isEmpty())
     {
-        //debugI("MqttHandler: Trying MQTT connect with user/pass: [%s]/[****]", settings.mqtt.username.c_str());
-        debugI("MqttHandler: Trying MQTT connect with user/pass: [%s]/[%s][****]", settings.mqtt.username.c_str(), settings.mqtt.password.c_str());
-        //isConnected = 
+        debugI("MqttHandler: Trying MQTT connect with user/pass: [%s]/[****]", settings.mqtt.username.c_str());
         mqttClient.connect(settings.device.name.c_str(), settings.mqtt.username.c_str(), settings.mqtt.password.c_str());
     }
     else
     {
         debugI("MqttHandler: Trying MQTT connect WITHOUT credentials");
-        //isConnected = 
         mqttClient.connect(settings.device.name.c_str());
     }
     
-    //if (isConnected)
     if (mqttClient.connected())
     {
-        debugI("MqttHandler: Connected as client [%s]", settings.device.name.c_str());
-
         // Subscribe to the topic from settings
+        debugI("MqttHandler: Connected as client [%s]", settings.device.name.c_str());
         mqttClient.subscribe(settings.mqtt.subTopic.c_str());
         debugI("MqttHandler: Subscribed to [%s]", settings.mqtt.subTopic.c_str());
-
-        // Optionally publish a "hello" message
-        // publish(settings.mqttPubTopic.c_str(), "Hello from ESP32-S3!");
-
         String helloMessage = "Device: " + settings.device.name + " connected.";
         publish(settings.mqtt.pubTopic.c_str(), helloMessage.c_str());
+        settings.mqtt.isConnected = true;
     }
     else
     {
@@ -193,10 +173,3 @@ void MqttHandler::registerCommands()
 }
 
 #endif // ENABLE_MQTT_HANDLER
-
-/*
-debugI("settings.mqttServer: %s", settings.mqttServer.c_str());
-debugI("settings.mqttPort: %d", settings.mqttPort);
-debugI("settings.mqttUsername: %s", settings.mqttUsername.c_str());
-debugI("settings.mqttPassword: %s", settings.mqttPassword.c_str());
-*/

@@ -13,17 +13,11 @@ struct DeviceSettings {
     uint64_t bootCount;
     uint64_t bootTime;
     uint64_t upTime;
-
-    // Device security
     String userName;
     String userPassword;
-
-    // Button commands
     String singlePress;
     String doublePress;
     String longPress;
-
-    // Boot command
     String bootCommand;
 };
 
@@ -44,6 +38,7 @@ struct MqttSettings {
     String password; //todo fix name to userPassword for consistency
     String subTopic;
     String pubTopic;
+    bool isConnected;
 };
 
 // Sub-struct for security/auth
