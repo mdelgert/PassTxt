@@ -305,7 +305,8 @@ function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
   document.getElementById("editCategory").value = categories[0]?.id || "";
-  document.getElementById("editScript").value = scripts[0] || ""; // Default to first script (full path)
+  //document.getElementById("editScript").value = scripts[0] || ""; // Default to first script (full path)
+  document.getElementById("editScript").value = "";
   previousCategoryId = categories[0]?.id || "";
   document.getElementById("editDeviceAction").value = "1";
   document.getElementById("editPasswordAction").value = "1";
