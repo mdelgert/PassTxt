@@ -255,3 +255,6 @@ If managing client certificates is too complex, Azure supports SAS tokens:
 Your code won’t work with Azure Event Grid as-is because it lacks client certificate support, which Azure mandates. With the modifications above—adding client cert and key handling—it can work. However, this adds complexity compared to EMQX, where your current setup already functions with just a CA certificate.
 
 If you’re not tied to Azure, sticking with EMQX might be simpler. If you need Azure’s ecosystem (e.g., Event Hubs integration), adapt your code as outlined. Test with a small setup first to ensure stability on your ESP32!
+
+### Client authentication using CA certificate chain
+https://learn.microsoft.com/en-us/azure/event-grid/mqtt-certificate-chain-client-authentication
