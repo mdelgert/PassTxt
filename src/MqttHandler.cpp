@@ -8,14 +8,14 @@
 #include <PubSubClient.h>
 #include <LittleFS.h>
 
-static NonBlockingTimer mqttTimer(60000);
+static NonBlockingTimer mqttTimer(settings.device.defaultTimeout);
 WiFiClient wiFiClient;
 WiFiClientSecure wiFiClientSecure;
 PubSubClient mqttClient;
 
 void MqttHandler::init()
 {
-    if(!settings.mqtt.enabled)return;
+    if(!settings.mqtt.enabled) return;
     registerCommands();
     connectToMqtt();
 }
