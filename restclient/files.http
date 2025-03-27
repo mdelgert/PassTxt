@@ -1,4 +1,4 @@
-@baseUrl = http://demo1.local
+@baseUrl = http://passtxt4.local
 @token = test
 
 ### Get all files
@@ -24,6 +24,13 @@ Content-Type: text/plain
 
 ### Search for json files
 GET {{baseUrl}}/search?query=json
+Authorization: Bearer {{token}}
+Content-Type: text/plain
+
+###
+
+### Search for scripts
+GET {{baseUrl}}/search?query=/scripts
 Authorization: Bearer {{token}}
 Content-Type: text/plain
 
