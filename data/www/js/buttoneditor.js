@@ -8,6 +8,7 @@ const token = "test";
 let items = [];
 let editingItemId = null;
 let categories = [];
+let scripts = []; // Stores full paths like "/scripts/filename.txt"
 let previousCategoryId = null;
 
 const fetchCategories = async () => {
@@ -45,6 +46,46 @@ const fetchButtons = async () => {
   }
 };
 
+const fetchScripts = async () => {
+  try {
+    const response = await fetch(`${endPoint}/folder/files?path=/scripts`);
+    if (response.ok) {
+      const data = await response.json();
+      // Prepend "/scripts/" to each file to store full paths
+      scripts = (data.data.files || []).map(file => `/scripts/${file}`);
+      populateScriptDropdown();
+    } else {
+      throw new Error("Failed to fetch scripts");
+    }
+  } catch (err) {
+    console.error("Error fetching scripts:", err);
+    showModalError("Failed to load scripts. Please try again.");
+    scripts = [];
+    populateScriptDropdown();
+  }
+};
+
+function populateScriptDropdown() {
+  const editScript = document.getElementById("editScript");
+  editScript.innerHTML = '<option value="" disabled selected>Select a script</option>';
+
+  if (scripts.length === 0) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No scripts available";
+    option.disabled = true;
+    editScript.appendChild(option);
+    return;
+  }
+
+  scripts.forEach(script => {
+    const option = document.createElement("option");
+    option.value = script; // Full path (e.g., "/scripts/filename.txt")
+    option.textContent = script; // Display full path
+    editScript.appendChild(option);
+  });
+}
+
 function getCategoryNameById(id) {
   const category = categories.find(cat => cat.id === id);
   return category ? category.name : "Unknown";
@@ -69,7 +110,7 @@ function populateCategoryFilter(categoryFilter, buttons) {
 }
 
 function populateEditCategory(editCategory, newCategoryBox) {
-  editCategory.innerHTML = '<option value="" disabled selected>Select category</option>'; // Placeholder for dropdown
+  editCategory.innerHTML = '<option value="" disabled selected>Select category</option>';
   categories.forEach(cat => {
     const option = document.createElement("option");
     option.value = cat.id;
@@ -226,8 +267,6 @@ function closeModal() {
 }
 
 async function deleteItem(id) {
-  //First confirm deletion
-  //if (!confirm("Are you sure you want to delete this button?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (!response.ok) {
@@ -240,19 +279,25 @@ async function deleteItem(id) {
   }
 }
 
-// Function to toggle fields based on editDeviceAction value
 function toggleFields() {
   const editDeviceAction = document.getElementById('editDeviceAction');
   const commandFields = document.getElementById('commandFields');
   const passwordFields = document.getElementById('passwordFields');
-  
+  const scriptBox = document.getElementById('new-script-box');
+
   const value = editDeviceAction.value;
-  if (value === '1') {
+  if (value === '1') { // Password
     passwordFields.classList.remove('hidden');
     commandFields.classList.add('hidden');
-  } else if (value === '2') {
+    scriptBox.classList.add('hidden');
+  } else if (value === '2') { // Command
     passwordFields.classList.add('hidden');
     commandFields.classList.remove('hidden');
+    scriptBox.classList.add('hidden');
+  } else if (value === '3') { // Script
+    passwordFields.classList.add('hidden');
+    commandFields.classList.add('hidden');
+    scriptBox.classList.remove('hidden');
   }
 }
 
@@ -260,6 +305,7 @@ function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
   document.getElementById("editCategory").value = categories[0]?.id || "";
+  document.getElementById("editScript").value = scripts[0] || ""; // Default to first script (full path)
   previousCategoryId = categories[0]?.id || "";
   document.getElementById("editDeviceAction").value = "1";
   document.getElementById("editPasswordAction").value = "1";
@@ -272,7 +318,7 @@ function openModalForAdd() {
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
-  toggleFields(); // Set initial visibility
+  toggleFields();
 }
 
 function openModal(id) {
@@ -280,6 +326,7 @@ function openModal(id) {
   const item = items.find((i) => i.id === id);
   document.getElementById("editName").value = item.name;
   document.getElementById("editCategory").value = item.categoryId;
+  document.getElementById("editScript").value = item.script || ""; // Full path matches dropdown
   previousCategoryId = item.categoryId;
   document.getElementById("editDeviceAction").value = item.deviceAction;
   document.getElementById("editPasswordAction").value = item.passwordAction;
@@ -292,12 +339,13 @@ function openModal(id) {
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
-  toggleFields(); // Set initial visibility based on loaded value
+  toggleFields();
 }
 
 async function saveChanges() {
   const name = document.getElementById("editName").value;
   const categoryId = document.getElementById("editCategory").value;
+  const script = document.getElementById("editScript").value; // Full path from dropdown
   const deviceAction = document.getElementById("editDeviceAction").value;
   const passwordAction = document.getElementById("editPasswordAction").value;
   const command = document.getElementById("editCommand").value;
@@ -309,27 +357,22 @@ async function saveChanges() {
     showModalError("Button label is required.");
     return;
   }
-  
-  // if (!command) {
-  //   showModalError("Command is required.");
-  //   return;
-  // }
 
   if (deviceAction === "2" && !command) {
     showModalError("Command is required for Command action.");
     return;
   }
-  
-  // if (deviceAction === "1" && !userPassword) {
-  //   showModalError("Password is required for action.");
-  //   return;
-  // }
-  
+
+  if (deviceAction === "3" && !script) {
+    showModalError("Script is required for Script action.");
+    return;
+  }
+
   if (categoryId === "add-new") {
     showModalError("Please save or select a valid category.");
     return;
   }
-  
+
   const button = { 
     id: editingItemId || null,
     name,
@@ -337,6 +380,7 @@ async function saveChanges() {
     deviceAction,
     passwordAction,
     command,
+    script, // Save full path directly (e.g., "/scripts/filename.txt")
     userName,
     userPassword, 
     notes
@@ -354,13 +398,11 @@ async function saveChanges() {
     }
     
     await fetchButtons();
-    
     closeModal();
-
-    } catch (err) {
-      showModalError("Failed to save button. Please try again.");
-      console.error("Error saving button:", err);
-    }
+  } catch (err) {
+    showModalError("Failed to save button. Please try again.");
+    console.error("Error saving button:", err);
+  }
 }
 
 async function init() {
@@ -371,17 +413,17 @@ async function init() {
   const saveNewCategoryBtn = document.getElementById("save-new-category");
   const cancelNewCategoryBtn = document.getElementById("cancel-new-category");
   const editDeviceAction = document.getElementById("editDeviceAction");
-  const addButton = document.getElementById("addButton"); // New reference
+  const addButton = document.getElementById("addButton");
 
   await fetchCategories();
   populateEditCategory(editCategory, newCategoryBox);
+
   await fetchButtons();
   populateCategoryFilter(categoryFilter, items);
- 
-  //This throws errors attaching event listeners
-  //document.querySelector("button[onclick='openModalForAdd()']").addEventListener("click", openModalForAdd);
-  addButton.addEventListener("click", openModalForAdd); // Updated line
 
+  await fetchScripts();
+
+  addButton.addEventListener("click", openModalForAdd);
   document.getElementById("saveChanges").addEventListener("click", saveChanges);
   document.getElementById("closeModal").addEventListener("click", closeModal);
   document.getElementById("closeModalFooter").addEventListener("click", closeModal);
@@ -389,7 +431,6 @@ async function init() {
   saveNewCategoryBtn.addEventListener("click", () => saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
   cancelNewCategoryBtn.addEventListener("click", () => cancelNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
 
-  // Add event listener for dynamic toggling
   editDeviceAction.addEventListener('change', toggleFields);
 }
 

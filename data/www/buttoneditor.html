@@ -19,7 +19,6 @@
           <select id="categoryFilter" aria-label="Filter by category">
             <option value="all">All</option>
           </select>
-          <!-- <button onclick="openModalForAdd()">Add Button</button> -->
           <button id="addButton">Add Button</button>
         </div>
       </div>
@@ -37,12 +36,14 @@
           <select id="editDeviceAction" aria-label="Select action">
             <option value="1">Password</option>
             <option value="2">Command</option>
+            <option value="3">Script</option>
           </select>
-          <!-- Command Fields -->
+          <div id="new-script-box">
+            <select id="editScript" placeholder="Script name" aria-label="Select script"></select>
+          </div>
           <div id="commandFields">
             <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
           </div>
-          <!-- Password Fields -->
           <div id="passwordFields">
             <select id="editPasswordAction" aria-label="Select password action">
               <option value="1">Tab</option>
