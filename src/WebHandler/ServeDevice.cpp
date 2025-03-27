@@ -33,41 +33,34 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         JsonDocument doc;
 
         doc["firmwareVersion"]   = SOFTWARE_VERSION;
+        doc["freeHeap"]    = ESP.getFreeHeap();
+        doc["heapSize"]    = ESP.getHeapSize();
         doc["deviceName"]   = settings.device.name;
-
-        // doc["timezoneSettings"]    = settings.timezone;
-        // doc["timezoneTimehandler"]    = TimeHandler::getCurrentTimezone();
-
         doc["timezone"]    = settings.device.timezone;
-
-        //Need to cleanup when clock was not set caused reboot loop
-        doc["bootCount"]    = settings.device.bootCount;
-
+        doc["bootCount"]    = settings.device.bootCount; //Need to cleanup when clock was not set caused reboot loop
         doc["upTime"]    = settings.device.upTime;
-
-        //doc["bootTime"] = settings.bootTime;
         time_t bootTime = settings.device.bootTime; // Previously saved timestamp
         String formattedBootTime = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", bootTime);
-        
         doc["bootTime"] = formattedBootTime;
         doc["currentTime"]  = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y");
-
-        // doc["currentTime"]  = TimeHandler::formatDateTime("%I:%M:%S %p");
-        // doc["currentDate"]  = TimeHandler::formatDateTime("%m-%d-%Y");
-
         doc["ssid"]        = WiFi.SSID();
         doc["ip"]          = WiFi.localIP().toString();
         doc["mac"]         = WiFi.macAddress();
         doc["rssi"]        = WiFi.RSSI();
         doc["wifiMode"]    = WiFi.getMode();
         doc["wifiChannel"] = WiFi.channel();
+        doc["mqttConnected"] = settings.mqtt.isConnected;
+        doc["mqttEnabled"] = settings.mqtt.enabled;
+        doc["mqttServer"] = settings.mqtt.server;
+        doc["mqttPort"] = settings.mqtt.port;
+        doc["mqttSsl"] = settings.mqtt.ssl;
+        doc["mqttSubTopic"] = settings.mqtt.subTopic;
+        doc["mqttPubTopic"] = settings.mqtt.pubTopic;
         doc["tickRateHz"] = configTICK_RATE_HZ;
         doc["chipModel"]   = ESP.getChipModel();
         doc["chipRevision"] = (int)ESP.getChipRevision();
         doc["chipId"]      = ESP.getEfuseMac();
         doc["chipCores"] = ESP.getChipCores();
-        doc["heapSize"]    = ESP.getHeapSize();
-        doc["freeHeap"]    = ESP.getFreeHeap();
         doc["flashSize"]   = ESP.getFlashChipSize();
         doc["flashSpeed"]  = ESP.getFlashChipSpeed();
         doc["flashMode"]   = ESP.getFlashChipMode();
@@ -76,23 +69,10 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         doc["psramSize"]   = ESP.getPsramSize();
         doc["freePsram"]   = ESP.getFreePsram();
         doc["lastResetTime"] = esp_timer_get_time(); // Example: microseconds since startup
-        
-        // LittleFS Info
-        /*
-        if (LittleFS.begin(true)) { // Format if mounting fails blocking exsisting file manager
-            doc["littleFsTotalSpace"] = LittleFS.totalBytes();       // Total flash allocated for LittleFS
-            doc["littleFsUsedSpace"] = LittleFS.usedBytes();         // Space already used in LittleFS
-            doc["littleFsFreeSpace"] = LittleFS.totalBytes() - LittleFS.usedBytes(); // Available space
-            LittleFS.end();
-        } else {
-            doc["littleFsError"] = "Failed to mount LittleFS";
-        }
-        */
-
         doc["littleFsTotalSpace"] = LittleFS.totalBytes();
         doc["littleFsUsedSpace"] = LittleFS.usedBytes();
         doc["littleFsFreeSpace"] = LittleFS.totalBytes() - LittleFS.usedBytes();
-       
+        
          // Add reset reason
         esp_reset_reason_t resetReason = esp_reset_reason();
         switch (resetReason) {
@@ -108,18 +88,6 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
             case ESP_RST_SDIO:    doc["resetReason"] = "SDIO Reset"; break;
             default:              doc["resetReason"] = "Unknown Reset"; break;
         }
-
-        // Adding handler status
-        // doc["enableWifiHandler"] = ENABLE_WIFI_HANDLER;
-        // doc["enableWebHandler"] = ENABLE_WEB_HANDLER;
-        // doc["enableImprovHandler"] = ENABLE_IMPROV_HANDLER;
-        // doc["enableBluetoothHandler"] = ENABLE_BLUETOOTH_HANDLER;
-        // doc["enableGfxHandler"] = ENABLE_GFX_HANDLER;
-        // doc["enableButtonHandler"] = ENABLE_BUTTON_HANDLER;
-        // doc["enableLedHandler"] = ENABLE_LED_HANDLER;
-        // doc["enableRemoteDebugHandler"] = ENABLE_REMOTE_DEBUG_HANDLER;
-        // doc["enableMqttHandler"] = ENABLE_MQTT_HANDLER;
-        // doc["enableEzTimeHandler"] = ENABLE_EZTIME_HANDLER;
 
         WebHandler::sendSuccessResponse(request, "GET /device/get", &doc); });
 }
@@ -145,9 +113,7 @@ void ServeDevice::handleDeviceReboot(AsyncWebServer &server)
 
 void ServeDevice::handleDeviceWifiNetworks(AsyncWebServer &server)
 {
-    server.on("/device/wifi/networks", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        //const char *filePath = "/wifi_networks.json";
+    server.on("/device/wifi/networks", HTTP_GET, [](AsyncWebServerRequest *request){
 
         if (!LittleFS.begin(true)) {
             debugE("Failed to mount LittleFS");
@@ -203,73 +169,6 @@ void ServeDevice::handleDeviceTimezones(AsyncWebServer &server)
 
         WebHandler::sendSuccessResponse(request, "GET /device/timezones", &doc); });
 }
-
-/*
-void ServeDevice::handleDeviceTimezones(AsyncWebServer &server)
-{
-    server.on("/device/timezones", HTTP_GET, [](AsyncWebServerRequest *request) {
-        JsonDocument doc;  // Use DynamicJsonDocument
-        JsonArray array = doc.to<JsonArray>();
-
-        for (size_t i = 0; i < tz_db_tzs_size; i++) {  // Use indexed loop
-            const tz_db_pair_t &tz = tz_db_tzs[i];  // Access each timezone
-            JsonObject obj = array.add<JsonObject>(); // Use add<JsonObject>()
-            obj["name"] = tz.name;
-            obj["posix_str"] = tz.posix_str;
-        }
-
-        WebHandler::sendSuccessResponse(request, "GET /device/timezones", &doc);
-    });
-}
-*/
-
-/*
-// Tar not functioning at this time zipping files on frontend
-void ServeDevice::handleDeviceBackup(AsyncWebServer &server)
-{
-    server.on("/device/backup", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                  debugV("Received GET request on /device/backup");
-
-                  File exportFile = LittleFS.open("/backup.tar", "w");
-                  if (!exportFile)
-                  {
-                      request->send(500, "text/plain", "Failed to create export file");
-                      return;
-                  }
-
-                  File root = LittleFS.open("/");
-                  File file = root.openNextFile();
-
-                  while (file)
-                  {
-                      // Write file metadata
-                      String header = "FILE:" + String(file.name()) + "\nSIZE:" + String(file.size()) + "\n";
-                      exportFile.write((const uint8_t *)header.c_str(), header.length());
-
-                      // Write file content
-                      uint8_t buffer[512];
-                      while (file.available())
-                      {
-                          size_t bytesRead = file.read(buffer, sizeof(buffer));
-                          exportFile.write(buffer, bytesRead);
-                      }
-
-                      // exportFile.write("\nEND\n", 5); // Mark the end of the file
-                      exportFile.write(reinterpret_cast<const uint8_t *>("\nEND\n"), 5); // Mark the end of the file
-                      file = root.openNextFile();
-                  }
-
-                  exportFile.close();
-                  // request->send(200, "text/plain", "Backup exported successfully to /backup.tar");
-
-                  // Create a JSON response
-                  JsonDocument data;
-                  data["data"] = "Backup success";
-
-                  WebHandler::sendSuccessResponse(request, "GET /device/backup", &data); });
-}
-*/
 
 void ServeDevice::handleDeviceFormat(AsyncWebServer &server)
 {
