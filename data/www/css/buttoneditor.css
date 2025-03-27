@@ -28,6 +28,30 @@ body {
   padding: 0;
 }
 
+/*
+.hidden {
+  display: none;
+}
+*/
+
+.command-fields,
+.password-fields {
+  transition: opacity 0.3s ease;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.command-fields:not(.hidden),
+.password-fields:not(.hidden) {
+  opacity: 1;
+}
+
 .container {
   max-width: 600px;
   margin: 20px auto;

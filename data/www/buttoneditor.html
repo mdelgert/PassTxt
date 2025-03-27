@@ -19,7 +19,8 @@
           <select id="categoryFilter" aria-label="Filter by category">
             <option value="all">All</option>
           </select>
-          <button onclick="openModalForAdd()">Add Button</button>
+          <!-- <button onclick="openModalForAdd()">Add Button</button> -->
+          <button id="addButton">Add Button</button>
         </div>
       </div>
       <ul id="itemList" aria-label="List of buttons"></ul>
@@ -40,20 +41,27 @@
             <div class="new-category-error" id="newCategoryError"></div>
             <div class="new-category-actions">
               <button id="save-new-category">Save</button>
+              <button id="cancel-new-category">Cancel</button>
             </div>
           </div>
           <select id="editDeviceAction" aria-label="Select action">
             <option value="1">Password</option>
             <option value="2">Command</option>
           </select>
-          <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
-          <select id="editPasswordAction" aria-label="Select password action">
-            <option value="1">Tab</option>
-            <option value="2">Return</option>
-            <option value="3">None</option>
-          </select>
-          <input type="text" id="editUserName" placeholder="User Name" aria-label="User Name">
-          <input type="password" id="editUserPassword" placeholder="Password" aria-label="Password">
+          <!-- Command Fields -->
+          <div id="commandFields">
+            <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
+          </div>
+          <!-- Password Fields -->
+          <div id="passwordFields">
+            <select id="editPasswordAction" aria-label="Select password action">
+              <option value="1">Tab</option>
+              <option value="2">Return</option>
+              <option value="3">None</option>
+            </select>
+            <input type="text" id="editUserName" placeholder="User Name" aria-label="User Name">
+            <input type="password" id="editUserPassword" placeholder="Password" aria-label="Password">
+          </div>
           <textarea id="editNotes" placeholder="Notes (optional)" aria-label="Notes"></textarea>
         </div>
         <div class="modal-footer">

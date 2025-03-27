@@ -226,6 +226,8 @@ function closeModal() {
 }
 
 async function deleteItem(id) {
+  //First confirm deletion
+  if (!confirm("Are you sure you want to delete this button?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (!response.ok) {
@@ -235,6 +237,22 @@ async function deleteItem(id) {
   } catch (err) {
     console.error("Error deleting button:", err);
     showModalError("Failed to delete button. Please try again.");
+  }
+}
+
+// Function to toggle fields based on editDeviceAction value
+function toggleFields() {
+  const editDeviceAction = document.getElementById('editDeviceAction');
+  const commandFields = document.getElementById('commandFields');
+  const passwordFields = document.getElementById('passwordFields');
+  
+  const value = editDeviceAction.value;
+  if (value === '1') {
+    passwordFields.classList.remove('hidden');
+    commandFields.classList.add('hidden');
+  } else if (value === '2') {
+    passwordFields.classList.add('hidden');
+    commandFields.classList.remove('hidden');
   }
 }
 
@@ -254,6 +272,7 @@ function openModalForAdd() {
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
+  toggleFields(); // Set initial visibility
 }
 
 function openModal(id) {
@@ -273,6 +292,7 @@ function openModal(id) {
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
+  toggleFields(); // Set initial visibility based on loaded value
 }
 
 async function saveChanges() {
@@ -292,6 +312,16 @@ async function saveChanges() {
   
   // if (!command) {
   //   showModalError("Command is required.");
+  //   return;
+  // }
+
+  if (deviceAction === "2" && !command) {
+    showModalError("Command is required for Command action.");
+    return;
+  }
+  
+  // if (deviceAction === "1" && !userPassword) {
+  //   showModalError("Password is required for action.");
   //   return;
   // }
   
@@ -340,17 +370,27 @@ async function init() {
   const newCategoryNameInput = document.getElementById("new-category-name");
   const saveNewCategoryBtn = document.getElementById("save-new-category");
   const cancelNewCategoryBtn = document.getElementById("cancel-new-category");
+  const editDeviceAction = document.getElementById("editDeviceAction");
+  const addButton = document.getElementById("addButton"); // New reference
 
   await fetchCategories();
   populateEditCategory(editCategory, newCategoryBox);
   await fetchButtons();
   populateCategoryFilter(categoryFilter, items);
-  document.querySelector("button[onclick='openModalForAdd()']").addEventListener("click", openModalForAdd);
+ 
+  //This throws errors attaching event listeners
+  //document.querySelector("button[onclick='openModalForAdd()']").addEventListener("click", openModalForAdd);
+  addButton.addEventListener("click", openModalForAdd); // Updated line
+
   document.getElementById("saveChanges").addEventListener("click", saveChanges);
   document.getElementById("closeModal").addEventListener("click", closeModal);
   document.getElementById("closeModalFooter").addEventListener("click", closeModal);
+  
   saveNewCategoryBtn.addEventListener("click", () => saveNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
   cancelNewCategoryBtn.addEventListener("click", () => cancelNewCategory(editCategory, newCategoryBox, newCategoryNameInput));
+
+  // Add event listener for dynamic toggling
+  editDeviceAction.addEventListener('change', toggleFields);
 }
 
 export { init };
