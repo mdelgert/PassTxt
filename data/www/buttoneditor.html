@@ -1,3 +1,4 @@
+<!-- buttoneditor.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,22 +33,25 @@
         <div class="modal-error" id="modalError"></div>
         <div class="modal-body">
           <input type="text" id="editName" placeholder="Button Label" required aria-label="Button Label" aria-required="true">
-          <select id="editCategory" aria-label="Select category">
-            <!-- Options populated dynamically -->
+          <select id="editCategory" placeholder="New category name" aria-label="Select category">
           </select>
           <div id="new-category-box">
             <input type="text" id="new-category-name" placeholder="New category name" aria-label="New category name" />
             <div class="new-category-error" id="newCategoryError"></div>
             <div class="new-category-actions">
               <button id="save-new-category">Save</button>
-              <button id="cancel-new-category">Cancel</button>
             </div>
           </div>
-          <select id="editAction" aria-label="Select action">
-            <option value="Password">Password</option>
-            <option value="Command">Command</option>
+          <select id="editDeviceAction" aria-label="Select action">
+            <option value="1">Password</option>
+            <option value="2">Command</option>
           </select>
           <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
+          <select id="editPasswordAction" aria-label="Select password action">
+            <option value="1">Tab</option>
+            <option value="2">Return</option>
+            <option value="3">None</option>
+          </select>
           <input type="text" id="editUserName" placeholder="User Name" aria-label="User Name">
           <input type="password" id="editUserPassword" placeholder="Password" aria-label="Password">
           <textarea id="editNotes" placeholder="Notes (optional)" aria-label="Notes"></textarea>
@@ -60,7 +64,6 @@
     </div>
     <div id="footer-container"></div>
   </main>
-  
   <script type="module">
     import { init } from '/js/buttoneditor.js';
     init();

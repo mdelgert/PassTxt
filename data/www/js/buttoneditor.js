@@ -218,22 +218,24 @@ function renderList(filteredItems = items) {
   });
 }
 
-function openModal(id) {
-  editingItemId = id;
-  const item = items.find((i) => i.id === id);
-  document.getElementById("editName").value = item.name;
-  document.getElementById("editCategory").value = item.categoryId;
-  previousCategoryId = item.categoryId;
-  document.getElementById("editAction").value = item.action;
-  document.getElementById("editCommand").value = item.command || "";
-  document.getElementById("editUserName").value = item.userName || "";
-  document.getElementById("editUserPassword").value = item.userPassword || "";
-  document.getElementById("editNotes").value = item.notes || "";
-  document.getElementById("modalTitle").textContent = "Edit Button";
-  document.getElementById("editModal").style.display = "flex";
+function closeModal() {
+  document.getElementById("editModal").style.display = "none";
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
+}
+
+async function deleteItem(id) {
+  try {
+    const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (!response.ok) {
+      throw new Error("Failed to delete button");
+    }
+    await fetchButtons();
+  } catch (err) {
+    console.error("Error deleting button:", err);
+    showModalError("Failed to delete button. Please try again.");
+  }
 }
 
 function openModalForAdd() {
@@ -241,7 +243,8 @@ function openModalForAdd() {
   document.getElementById("editName").value = "";
   document.getElementById("editCategory").value = categories[0]?.id || "";
   previousCategoryId = categories[0]?.id || "";
-  document.getElementById("editAction").value = "Command";
+  document.getElementById("editDeviceAction").value = "1";
+  document.getElementById("editPasswordAction").value = "1";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
   document.getElementById("editUserPassword").value = "";
@@ -253,8 +256,20 @@ function openModalForAdd() {
   clearNewCategoryError();
 }
 
-function closeModal() {
-  document.getElementById("editModal").style.display = "none";
+function openModal(id) {
+  editingItemId = id;
+  const item = items.find((i) => i.id === id);
+  document.getElementById("editName").value = item.name;
+  document.getElementById("editCategory").value = item.categoryId;
+  previousCategoryId = item.categoryId;
+  document.getElementById("editDeviceAction").value = item.deviceAction;
+  document.getElementById("editPasswordAction").value = item.passwordAction;
+  document.getElementById("editCommand").value = item.command || "";
+  document.getElementById("editUserName").value = item.userName || "";
+  document.getElementById("editUserPassword").value = item.userPassword || "";
+  document.getElementById("editNotes").value = item.notes || "";
+  document.getElementById("modalTitle").textContent = "Edit Button";
+  document.getElementById("editModal").style.display = "flex";
   document.getElementById("new-category-box").style.display = "none";
   clearModalError();
   clearNewCategoryError();
@@ -263,7 +278,8 @@ function closeModal() {
 async function saveChanges() {
   const name = document.getElementById("editName").value;
   const categoryId = document.getElementById("editCategory").value;
-  const action = document.getElementById("editAction").value;
+  const deviceAction = document.getElementById("editDeviceAction").value;
+  const passwordAction = document.getElementById("editPasswordAction").value;
   const command = document.getElementById("editCommand").value;
   const userName = document.getElementById("editUserName").value;
   const userPassword = document.getElementById("editUserPassword").value;
@@ -278,17 +294,18 @@ async function saveChanges() {
   //   showModalError("Command is required.");
   //   return;
   // }
-
+  
   if (categoryId === "add-new") {
     showModalError("Please save or select a valid category.");
     return;
   }
-
+  
   const button = { 
     id: editingItemId || null,
     name,
     categoryId: parseInt(categoryId),
-    action,
+    deviceAction,
+    passwordAction,
     command,
     userName,
     userPassword, 
@@ -305,26 +322,15 @@ async function saveChanges() {
     if (!response.ok) {
       throw new Error("Failed to save button");
     }
-
+    
     await fetchButtons();
+    
     closeModal();
-  } catch (err) {
-    showModalError("Failed to save button. Please try again.");
-    console.error("Error saving button:", err);
-  }
-}
 
-async function deleteItem(id) {
-  try {
-    const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (!response.ok) {
-      throw new Error("Failed to delete button");
+    } catch (err) {
+      showModalError("Failed to save button. Please try again.");
+      console.error("Error saving button:", err);
     }
-    await fetchButtons();
-  } catch (err) {
-    console.error("Error deleting button:", err);
-    showModalError("Failed to delete button. Please try again.");
-  }
 }
 
 async function init() {
@@ -339,7 +345,6 @@ async function init() {
   populateEditCategory(editCategory, newCategoryBox);
   await fetchButtons();
   populateCategoryFilter(categoryFilter, items);
-
   document.querySelector("button[onclick='openModalForAdd()']").addEventListener("click", openModalForAdd);
   document.getElementById("saveChanges").addEventListener("click", saveChanges);
   document.getElementById("closeModal").addEventListener("click", closeModal);
