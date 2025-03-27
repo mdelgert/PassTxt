@@ -227,7 +227,7 @@ function closeModal() {
 
 async function deleteItem(id) {
   //First confirm deletion
-  if (!confirm("Are you sure you want to delete this button?")) return;
+  //if (!confirm("Are you sure you want to delete this button?")) return;
   try {
     const response = await fetch(`${endPoint}/buttons?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (!response.ok) {
