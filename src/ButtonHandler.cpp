@@ -94,6 +94,9 @@ void ButtonHandler::handleDuringLongPress()
         debugI("Hold duration exceeded %lu ms. Rebooting device...", REBOOT_HOLD_DURATION_MS);
         rebootTriggered = true; // Set the flag to prevent multiple reboots
         LedHandler::setColorByName("purple");
+        GfxHandler::printMessage("Clearing preferences...");
+        ConfigManager::clearPreferences(); // Clear all preferences
+        delay(1000); // Brief delay to ensure the message is displayed
         GfxHandler::printMessage("Rebooting now...");
         delay(1000); // Brief delay to ensure the message is displayed
         ESP.restart(); // Reboot the device (ESP32-specific)
