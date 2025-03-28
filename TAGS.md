@@ -42,3 +42,8 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Description:**
 - Mqtt cleanup
 - Add exponential back off
+
+### Tag: v1.0.5
+**Date:** 2025-26-03
+**Description:**
+- Add button commands

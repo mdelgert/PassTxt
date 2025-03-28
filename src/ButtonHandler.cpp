@@ -7,6 +7,8 @@
 #include "GfxHandler.h"
 #include "LedHandler.h"
 #include <OneButton.h>
+#include <LittleFS.h>
+#include <ArduinoJson.h>
 
 // Configurable durations (in milliseconds)
 const unsigned long REBOOT_HOLD_DURATION_MS = 5000; // 5 seconds total hold time to reboot
@@ -24,12 +26,13 @@ static OneButton button(BUTTON_PIN, true);
 // Initialize the button
 void ButtonHandler::init()
 {
+    debugI("ButtonHandler initialized on pin: %d", BUTTON_PIN);
     button.attachClick(handleSingleClick);
     button.attachDoubleClick(handleDoubleClick);
     button.attachLongPressStart(handleLongPress);
     button.attachDuringLongPress(handleDuringLongPress);
     button.attachLongPressStop(handleLongPressStop);
-    debugI("ButtonHandler initialized on pin: %d", BUTTON_PIN);
+    registerCommands();
 }
 
 // Update the button state (call in loop)
@@ -102,6 +105,57 @@ void ButtonHandler::handleLongPressStop()
     rebootTriggered = false; // Reset the reboot flag
     lastCountdownValue = -1; // Reset the countdown value
     GfxHandler::printMessage(""); // Clear the display message
+}
+
+void ButtonHandler::runButton(int id)
+{
+    debugI("Running button with ID: %d", id);
+
+    // Read the button from JSON file
+    File file = LittleFS.open(BUTTONS_FILE, "r");
+    JsonDocument buttonDoc;
+    DeserializationError error = deserializeJson(buttonDoc, file);
+    
+    if (error) {
+        debugE("Failed to deserialize existing JSON: %s", error.c_str());
+        file.close();
+        return;
+    }
+    file.close();
+
+    // Find the button with the specified ID
+    bool found = false;
+
+    for (JsonObject button : buttonDoc["buttons"].as<JsonArray>()) {
+        if (button["id"] == id) {
+            debugI("Found button with ID: %d", button["id"].as<int>());
+            CommandHandler::handleCommand(button["command"].as<String>());
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        debugW("Button ID not found: %d", id);
+    }
+}
+
+void ButtonHandler::registerCommands()
+{
+    CommandHandler::registerCommand("BUTTON", [](const String &command)
+                                    {
+        String cmd, args;
+        CommandHandler::parseCommand(command, cmd, args);
+
+        if (CommandHandler::equalsIgnoreCase(cmd, "RUN")) {
+            runButton(args.toInt());
+        } else {
+            debugW("Unknown BUTTON subcommand: %s", cmd.c_str());
+        } }, "Handles BUTTON commands. Usage: BUTTON <subcommand> <args>\n"
+                                         "  Subcommands:\n"
+                                         "  run <id> - Finds and runs button by id");
+        
+        CommandHandler::registerCommandAlias("BTN", "BUTTON");
 }
 
 #endif // ENABLE_BUTTON_HANDLER
