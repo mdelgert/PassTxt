@@ -49,6 +49,11 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 - Add button commands
 
 ### Tag: v1.0.6
-**Date:** 2025-26-03
+**Date:** 2025-27-03
 **Description:**
 - Add clear preferences
+
+### Tag: v1.0.7
+**Date:** 2025-28-03
+**Description:**
+- Cleanup add password form
