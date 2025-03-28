@@ -1,8 +1,14 @@
-@baseUrl = http://passtxt1.local
+@baseUrl = http://passtxt4.local
 @token = test
 
 ### Get All Buttons
 GET {{baseUrl}}/buttons
+Authorization: Bearer {{token}}
+
+###
+
+### Run a button by ID
+POST {{baseUrl}}/run-button?id=7
 Authorization: Bearer {{token}}
 
 ###

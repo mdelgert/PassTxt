@@ -3,6 +3,7 @@
 #include "ServeButtons.h"
 #include "Globals.h"
 #include "WebHandler.h"
+#include "ButtonHandler.h"  // Add this include for runButton access
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 #include "CryptoHandler.h"
@@ -12,6 +13,7 @@ void ServeButtons::registerEndpoints(AsyncWebServer &server)
     server.on("/buttons", HTTP_GET, handleGetButtons);
     server.on("/buttons", HTTP_DELETE, handleDeleteButton);
     server.on("/buttons", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, handlePostButtons);
+    server.on("/run-button", HTTP_POST, handleRunButton);  // New endpoint for running buttons
 }
 
 void ServeButtons::handleGetButtons(AsyncWebServerRequest *request)
@@ -218,6 +220,33 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
     file.close();
     debugV("File write successful");
     WebHandler::sendSuccessResponse(request, "Buttons updated successfully");
+}
+
+void ServeButtons::handleRunButton(AsyncWebServerRequest *request)
+{
+    debugV("Received POST request on /run-button");
+
+    if (!request->hasParam("id")) {  // Check for query string parameter
+        WebHandler::sendErrorResponse(request, 400, "Missing button ID in query string");
+        return;
+    }
+
+    String buttonIdStr = request->getParam("id")->value();
+    int buttonId;
+    
+    // Convert string to integer and validate
+    if (!buttonIdStr.toInt() || buttonIdStr.toInt() <= 0) {
+        WebHandler::sendErrorResponse(request, 400, "Invalid button ID: %s", buttonIdStr.c_str());
+        return;
+    }
+    
+    buttonId = buttonIdStr.toInt();
+    debugV("Attempting to run button with ID: %d", buttonId);
+
+    // Execute the button action
+    ButtonHandler::runButton(buttonId);
+
+    WebHandler::sendSuccessResponse(request, "Button executed successfully");
 }
 
 #endif // ENABLE_WEB_HANDLER
