@@ -146,7 +146,7 @@ void ButtonHandler::executeButtonAction(const JsonObject& button) {
     const String deviceAction = button["deviceAction"].as<String>();
     
     if (deviceAction == "1") {  // Login credentials
-        DeviceHandler::sendKeys(button["username"].as<String>());
+        DeviceHandler::sendKeys(button["userName"].as<String>());
         
         const String passwordAction = button["passwordAction"].as<String>();
         if (passwordAction == "1") {
