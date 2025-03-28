@@ -1,3 +1,4 @@
+https://fontawesome.com/search
 https://www.svgrepo.com/
 https://heroicons.com/
 https://feathericons.com/
