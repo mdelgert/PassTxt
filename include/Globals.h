@@ -3,11 +3,11 @@
 #define WIFI_NETWORKS_FILE "/data/networks.json"
 #define CATEGORIES_FILE "/data/categories.json"
 
-//#define BUTTONS_FILE "/data/buttons.json"
-#define BUTTONS_FILE "/data/buttonsSecure.json"
+#define BUTTONS_FILE "/data/buttons.json"
+//#define BUTTONS_FILE "/data/buttonsSecure.json"
 
-//#define SETTINGS_FILE "/data/settings.json"
-#define SETTINGS_FILE "/data/settingsSecure.json"
+#define SETTINGS_FILE "/data/settings.json"
+//#define SETTINGS_FILE "/data/settingsSecure.json"
 
 #define EMQX_CERT_FILE "/data/mqtt1.crt"
 #define TIMEZONES_FILE "/data/timezones.json"
