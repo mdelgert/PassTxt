@@ -316,6 +316,19 @@ function openModalForAdd() {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
+
+  // Reset password field to type="password" and toggle icons
+  const passwordField = document.getElementById('editUserPassword');
+  const eyeOpen = document.querySelector('.toggle-password .eye-open');
+  const eyeClosed = document.querySelector('.toggle-password .eye-closed');
+  if (passwordField) {
+    passwordField.type = 'password';
+    if (eyeOpen && eyeClosed) {
+      eyeOpen.style.display = 'block';
+      eyeClosed.style.display = 'none';
+    }
+  }
+
   attachPasswordEventListeners();
 }
 
@@ -338,6 +351,19 @@ function openModal(id) {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
+
+  // Reset password field to type="password" and toggle icons
+  const passwordField = document.getElementById('editUserPassword');
+  const eyeOpen = document.querySelector('.toggle-password .eye-open');
+  const eyeClosed = document.querySelector('.toggle-password .eye-closed');
+  if (passwordField) {
+    passwordField.type = 'password';
+    if (eyeOpen && eyeClosed) {
+      eyeOpen.style.display = 'block';
+      eyeClosed.style.display = 'none';
+    }
+  }
+
   attachPasswordEventListeners();
 }
 

@@ -28,7 +28,7 @@
         <div class="modal-header">
           <h2 id="modalTitle">Edit Button</h2>
           <button id="closeModal" aria-label="Close modal">X</button>
-        </div>
+        </div> 
         <div class="modal-error" id="modalError"></div>
         <div class="modal-body">
           <!-- Button Details Fields -->
@@ -45,14 +45,6 @@
             </select>
           </div>
           <div id="passwordFields" class="action-fields">
-            <div class="form-group">
-              <label for="editPasswordAction">Password Action</label>
-              <select id="editPasswordAction" aria-label="Select password action">
-                <option value="1">Tab</option>
-                <option value="2">Enter</option>
-                <option value="3">None</option>
-              </select>
-            </div>
             <div class="form-group">
               <label for="editUserName">User Name</label>
               <input type="text" id="editUserName" placeholder="e.g., john.doe@example.com" aria-label="User Name">
@@ -75,6 +67,14 @@
                 </span>
               </div>
               <button type="button" class="generate-password">Generate Password</button>
+            </div>
+            <div class="form-group">
+              <label for="editPasswordAction">Password Action</label>
+              <select id="editPasswordAction" aria-label="Select password action">
+                <option value="1">Tab</option>
+                <option value="2">Enter</option>
+                <option value="3">None</option>
+              </select>
             </div>
           </div>
           <div id="commandFields" class="action-fields hidden">
