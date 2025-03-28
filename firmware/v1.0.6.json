@@ -1,0 +1,17 @@
+{
+  "funding_url": "https://github.com/mdelgert/PassTxt",
+  "new_install_prompt_erase": true,
+  "name": "Demo",
+  "version": "v1.0.6",
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "v1.0.6.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
