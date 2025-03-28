@@ -6,9 +6,11 @@
 #include "CommandHandler.h"
 #include "GfxHandler.h"
 #include "LedHandler.h"
+#include "CryptoHandler.h"
+#include "DeviceHandler.h"
+#include "DuckyScriptHandler.h"
 #include <OneButton.h>
 #include <LittleFS.h>
-#include <ArduinoJson.h>
 
 // Configurable durations (in milliseconds)
 const unsigned long REBOOT_HOLD_DURATION_MS = 5000; // 5 seconds total hold time to reboot
@@ -107,36 +109,62 @@ void ButtonHandler::handleLongPressStop()
     GfxHandler::printMessage(""); // Clear the display message
 }
 
-void ButtonHandler::runButton(int id)
-{
+void ButtonHandler::runButton(int id) {
     debugI("Running button with ID: %d", id);
 
-    // Read the button from JSON file
     File file = LittleFS.open(BUTTONS_FILE, "r");
-    JsonDocument buttonDoc;
-    DeserializationError error = deserializeJson(buttonDoc, file);
-    
-    if (error) {
-        debugE("Failed to deserialize existing JSON: %s", error.c_str());
-        file.close();
+    if (!file) {
+        debugE("Failed to open buttons file");
         return;
     }
+
+    static JsonDocument buttonDoc;
+    DeserializationError error = deserializeJson(buttonDoc, file);
     file.close();
 
-    // Find the button with the specified ID
-    bool found = false;
+    if (error) {
+        debugE("Failed to deserialize JSON: %s", error.c_str());
+        return;
+    }
 
-    for (JsonObject button : buttonDoc["buttons"].as<JsonArray>()) {
-        if (button["id"] == id) {
-            debugI("Found button with ID: %d", button["id"].as<int>());
-            CommandHandler::handleCommand(button["command"].as<String>());
-            found = true;
-            break;
+    const JsonArray buttons = buttonDoc["buttons"].as<JsonArray>();
+    for (const JsonObject& button : buttons) {
+        if (button["id"].as<int>() == id) {
+            debugI("Found button with ID: %d", id);
+            executeButtonAction(button);
+            return;
         }
     }
+
+    debugW("Button ID not found: %d", id);
+}
+
+void ButtonHandler::executeButtonAction(const JsonObject& button) {
+    const String deviceAction = button["deviceAction"].as<String>();
     
-    if (!found) {
-        debugW("Button ID not found: %d", id);
+    if (deviceAction == "1") {  // Login credentials
+        DeviceHandler::sendKeys(button["username"].as<String>());
+        
+        const String passwordAction = button["passwordAction"].as<String>();
+        if (passwordAction == "1") {
+            DeviceHandler::tapKey("TAB");
+        } else if (passwordAction == "2") {
+            DeviceHandler::tapKey("ENTER");
+        }
+        
+        String decryptedPassword = CryptoHandler::decryptAES(
+            button["userPassword"].as<String>(), 
+            settings.device.userPassword
+        );
+        DeviceHandler::sendKeys(decryptedPassword);
+    }
+    else if (deviceAction == "2") {  // Command
+        CommandHandler::handleCommand(button["command"].as<String>());
+    }
+    else if (deviceAction == "3") {  // DuckyScript
+        String filePath = button["script"].as<String>();
+        DuckyScriptHandler::executeScript(filePath);
+        //CommandHandler::handleCommand("script file " + filePath);
     }
 }
 
@@ -159,3 +187,80 @@ void ButtonHandler::registerCommands()
 }
 
 #endif // ENABLE_BUTTON_HANDLER
+
+/*
+void ButtonHandler::runButton(int id)
+{
+    debugI("Running button with ID: %d", id);
+
+    // Read the button from JSON file
+    File file = LittleFS.open(BUTTONS_FILE, "r");
+    JsonDocument buttonDoc;
+    DeserializationError error = deserializeJson(buttonDoc, file);
+    
+    if (error) {
+        debugE("Failed to deserialize existing JSON: %s", error.c_str());
+        file.close();
+        return;
+    }
+    file.close();
+
+    // Find the button with the specified ID
+    bool found = false;
+
+    for (JsonObject button : buttonDoc["buttons"].as<JsonArray>()) {
+        if (button["id"] == id) {
+            
+            debugI("Found button with ID: %d", button["id"].as<int>());
+
+            // Send username and password
+            if(button["deviceAction"] == "1")
+            {
+                // Send username
+                DeviceHandler::sendKeys(button["username"].as<String>());
+
+                // Send tab key
+                if(button["passwordAction"] == "1")
+                {
+                    DeviceHandler::processKey("TAB", true);
+                    delay(50);
+                    DeviceHandler::processKey("TAB", false);
+                }
+
+                // Send enter key
+                if(button["passwordAction"] == "2")
+                {
+                    DeviceHandler::processKey("ENTER", true);
+                    delay(50);
+                    DeviceHandler::processKey("ENTER", false);
+                }
+
+                // Send password
+                String decryptedPassword = CryptoHandler::decryptAES(button["userPassword"].as<String>(), settings.device.userPassword);
+                DeviceHandler::sendKeys(decryptedPassword);
+            }
+
+            // Send command
+            if(button["deviceAction"] == "2")
+            {
+                CommandHandler::handleCommand(button["command"].as<String>());
+            }
+
+            // Send DuckyScript
+            if(button["deviceAction"] == "3")
+            {
+                String filePath = button["script"].as<String>();
+                String command = "script file " + filePath;
+                CommandHandler::handleCommand(command);
+            }
+
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        debugW("Button ID not found: %d", id);
+    }
+}
+*/

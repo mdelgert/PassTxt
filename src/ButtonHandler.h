@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ArduinoJson.h>
+
 #ifdef ENABLE_BUTTON_HANDLER
 
 // Full implementation of ButtonHandler
@@ -19,6 +21,7 @@ private:
     static bool rebootTriggered; // Flag to prevent multiple reboots
     static int lastCountdownValue; // Track the last displayed countdown value
     static void registerCommands();
+    static void executeButtonAction(const JsonObject& button);
 };
 
 #else
