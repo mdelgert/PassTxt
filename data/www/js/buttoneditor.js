@@ -316,7 +316,7 @@ function openModalForAdd() {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
-  attachPasswordEventListeners(); // Attach event listeners when modal opens
+  attachPasswordEventListeners();
 }
 
 function openModal(id) {
@@ -338,7 +338,7 @@ function openModal(id) {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
-  attachPasswordEventListeners(); // Attach event listeners when modal opens
+  attachPasswordEventListeners();
 }
 
 async function saveChanges() {
@@ -406,13 +406,17 @@ async function saveChanges() {
 
 function togglePassword() {
   const passwordField = document.getElementById('editUserPassword');
-  const toggleIcon = document.querySelector('.toggle-password');
+  const eyeOpen = document.querySelector('.toggle-password .eye-open');
+  const eyeClosed = document.querySelector('.toggle-password .eye-closed');
+  
   if (passwordField.type === 'password') {
     passwordField.type = 'text';
-    toggleIcon.textContent = '👁️‍🗨️';
+    eyeOpen.style.display = 'none';
+    eyeClosed.style.display = 'block';
   } else {
     passwordField.type = 'password';
-    toggleIcon.textContent = '👁️';
+    eyeOpen.style.display = 'block';
+    eyeClosed.style.display = 'none';
   }
 }
 
@@ -424,7 +428,8 @@ function generatePassword() {
   }
   document.getElementById('editUserPassword').value = password;
   document.getElementById('editUserPassword').type = 'text';
-  document.querySelector('.toggle-password').textContent = '👁️‍🗨️';
+  document.querySelector('.toggle-password .eye-open').style.display = 'none';
+  document.querySelector('.toggle-password .eye-closed').style.display = 'block';
 }
 
 function attachPasswordEventListeners() {
