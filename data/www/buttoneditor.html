@@ -1,4 +1,3 @@
-<!-- buttoneditor.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,42 +31,82 @@
         </div>
         <div class="modal-error" id="modalError"></div>
         <div class="modal-body">
-          <input type="text" id="editName" placeholder="Button Label" required aria-label="Button Label" aria-required="true">
-          <select id="editDeviceAction" aria-label="Select action">
-            <option value="1">Password</option>
-            <option value="2">Command</option>
-            <option value="3">Script</option>
-          </select>
-          <div id="new-script-box">
-            <select id="editScript" placeholder="Script name" aria-label="Select script"></select>
-          </div>
-          <div id="commandFields">
-            <input type="text" id="editCommand" placeholder="Command" required aria-label="Command" aria-required="true">
-          </div>
-          <div id="passwordFields">
-            <select id="editPasswordAction" aria-label="Select password action">
-              <option value="1">Tab</option>
-              <option value="2">Enter</option>
-              <option value="3">None</option>
-            </select>
-            <input type="text" id="editUserName" placeholder="User Name" aria-label="User Name">
-            <input type="password" id="editUserPassword" placeholder="Password" aria-label="Password">
-          </div>
-          <select id="editCategory" placeholder="New category name" aria-label="Select category">
-          </select>
-          <div id="new-category-box">
-            <input type="text" id="new-category-name" placeholder="New category name" aria-label="New category name" />
-            <div class="new-category-error" id="newCategoryError"></div>
-            <div class="new-category-actions">
-              <button id="save-new-category">Save</button>
-              <button id="cancel-new-category">Cancel</button>
+          <!-- Button Details Section -->
+          <div class="form-section">
+            <h3>Button Details</h3>
+            <div class="form-group">
+              <label for="editName" class="required">Button Label</label>
+              <input type="text" id="editName" placeholder="e.g., Work Email" required aria-label="Button Label" aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="editDeviceAction" class="required">Action Type</label>
+              <select id="editDeviceAction" aria-label="Select action">
+                <option value="1">Password</option>
+                <option value="2">Command</option>
+                <option value="3">Script</option>
+              </select>
+            </div>
+            <div id="passwordFields" class="action-fields">
+              <div class="form-group">
+                <label for="editPasswordAction">Password Action</label>
+                <select id="editPasswordAction" aria-label="Select password action">
+                  <option value="1">Tab</option>
+                  <option value="2">Enter</option>
+                  <option value="3">None</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="editUserName">User Name</label>
+                <input type="text" id="editUserName" placeholder="e.g., john.doe@example.com" aria-label="User Name">
+              </div>
+              <div class="form-group">
+                <label for="editUserPassword">Password</label>
+                <input type="password" id="editUserPassword" placeholder="e.g., Xy#9mP!q" aria-label="Password">
+                <span class="toggle-password">👁️</span>
+                <button type="button" class="generate-password">Generate Password</button>
+              </div>
+            </div>
+            <div id="commandFields" class="action-fields hidden">
+              <div class="form-group">
+                <label for="editCommand" class="required">Command</label>
+                <input type="text" id="editCommand" placeholder="e.g., ssh user@host" required aria-label="Command" aria-required="true">
+              </div>
+            </div>
+            <div id="new-script-box" class="action-fields hidden">
+              <div class="form-group">
+                <label for="editScript" class="required">Script</label>
+                <select id="editScript" aria-label="Select script"></select>
+              </div>
             </div>
           </div>
-          <textarea id="editNotes" placeholder="Notes (optional)" aria-label="Notes"></textarea>
+
+          <!-- General Settings Section -->
+          <div class="form-section">
+            <h3>General Settings</h3>
+            <div class="form-group">
+              <label for="editCategory">Category</label>
+              <select id="editCategory" aria-label="Select category"></select>
+            </div>
+            <div id="new-category-box">
+              <div class="form-group">
+                <label for="new-category-name">New Category Name</label>
+                <input type="text" id="new-category-name" placeholder="e.g., Social Media" aria-label="New category name">
+              </div>
+              <div class="new-category-error" id="newCategoryError"></div>
+              <div class="new-category-actions">
+                <button id="save-new-category">Save</button>
+                <button id="cancel-new-category">Cancel</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="editNotes">Notes (optional)</label>
+              <textarea id="editNotes" placeholder="e.g., Security question: What’s your pet’s name?" aria-label="Notes"></textarea>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button id="saveChanges">Save</button>
           <button id="closeModalFooter">Cancel</button>
+          <button id="saveChanges">Save</button>
         </div>
       </div>
     </div>

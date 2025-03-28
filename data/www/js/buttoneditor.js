@@ -1,5 +1,3 @@
-// buttoneditor.js
-
 import { BASE_URL } from './config.js';
 
 const endPoint = BASE_URL;
@@ -8,7 +6,7 @@ const token = "test";
 let items = [];
 let editingItemId = null;
 let categories = [];
-let scripts = []; // Stores full paths like "/scripts/filename.txt"
+let scripts = [];
 let previousCategoryId = null;
 
 const fetchCategories = async () => {
@@ -51,7 +49,6 @@ const fetchScripts = async () => {
     const response = await fetch(`${endPoint}/folder/files?path=/scripts`);
     if (response.ok) {
       const data = await response.json();
-      // Prepend "/scripts/" to each file to store full paths
       scripts = (data.data.files || []).map(file => `/scripts/${file}`);
       populateScriptDropdown();
     } else {
@@ -80,8 +77,8 @@ function populateScriptDropdown() {
 
   scripts.forEach(script => {
     const option = document.createElement("option");
-    option.value = script; // Full path (e.g., "/scripts/filename.txt")
-    option.textContent = script; // Display full path
+    option.value = script;
+    option.textContent = script;
     editScript.appendChild(option);
   });
 }
@@ -305,7 +302,6 @@ function openModalForAdd() {
   editingItemId = null;
   document.getElementById("editName").value = "";
   document.getElementById("editCategory").value = categories[0]?.id || "";
-  //document.getElementById("editScript").value = scripts[0] || ""; // Default to first script (full path)
   document.getElementById("editScript").value = "";
   previousCategoryId = categories[0]?.id || "";
   document.getElementById("editDeviceAction").value = "1";
@@ -320,6 +316,7 @@ function openModalForAdd() {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
+  attachPasswordEventListeners(); // Attach event listeners when modal opens
 }
 
 function openModal(id) {
@@ -327,7 +324,7 @@ function openModal(id) {
   const item = items.find((i) => i.id === id);
   document.getElementById("editName").value = item.name;
   document.getElementById("editCategory").value = item.categoryId;
-  document.getElementById("editScript").value = item.script || ""; // Full path matches dropdown
+  document.getElementById("editScript").value = item.script || "";
   previousCategoryId = item.categoryId;
   document.getElementById("editDeviceAction").value = item.deviceAction;
   document.getElementById("editPasswordAction").value = item.passwordAction;
@@ -341,12 +338,13 @@ function openModal(id) {
   clearModalError();
   clearNewCategoryError();
   toggleFields();
+  attachPasswordEventListeners(); // Attach event listeners when modal opens
 }
 
 async function saveChanges() {
   const name = document.getElementById("editName").value;
   const categoryId = document.getElementById("editCategory").value;
-  const script = document.getElementById("editScript").value; // Full path from dropdown
+  const script = document.getElementById("editScript").value;
   const deviceAction = document.getElementById("editDeviceAction").value;
   const passwordAction = document.getElementById("editPasswordAction").value;
   const command = document.getElementById("editCommand").value;
@@ -381,7 +379,7 @@ async function saveChanges() {
     deviceAction,
     passwordAction,
     command,
-    script, // Save full path directly (e.g., "/scripts/filename.txt")
+    script,
     userName,
     userPassword, 
     notes
@@ -404,6 +402,44 @@ async function saveChanges() {
     showModalError("Failed to save button. Please try again.");
     console.error("Error saving button:", err);
   }
+}
+
+function togglePassword() {
+  const passwordField = document.getElementById('editUserPassword');
+  const toggleIcon = document.querySelector('.toggle-password');
+  if (passwordField.type === 'password') {
+    passwordField.type = 'text';
+    toggleIcon.textContent = '👁️‍🗨️';
+  } else {
+    passwordField.type = 'password';
+    toggleIcon.textContent = '👁️';
+  }
+}
+
+function generatePassword() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  document.getElementById('editUserPassword').value = password;
+  document.getElementById('editUserPassword').type = 'text';
+  document.querySelector('.toggle-password').textContent = '👁️‍🗨️';
+}
+
+function attachPasswordEventListeners() {
+  const togglePasswordBtn = document.querySelector('.toggle-password');
+  const generatePasswordBtn = document.querySelector('.generate-password');
+
+  // Remove existing listeners to prevent duplicates
+  const toggleClone = togglePasswordBtn.cloneNode(true);
+  togglePasswordBtn.parentNode.replaceChild(toggleClone, togglePasswordBtn);
+  const generateClone = generatePasswordBtn.cloneNode(true);
+  generatePasswordBtn.parentNode.replaceChild(generateClone, generatePasswordBtn);
+
+  // Attach new listeners
+  document.querySelector('.toggle-password').addEventListener('click', togglePassword);
+  document.querySelector('.generate-password').addEventListener('click', generatePassword);
 }
 
 async function init() {
