@@ -122,10 +122,41 @@ function renderButtons(buttons) {
     if (button.style?.width) btn.style.width = button.style.width;
 
     // Attach click event to send the command
-    btn.onclick = () => sendCommand(button.command);
+    //btn.onclick = () => sendCommand(button.command);
+
+    // Modified click event to run the button instead of sending command
+    btn.onclick = () => runButton(button.id);
 
     container.appendChild(btn);
   });
+}
+
+// New function to run a button by ID
+export async function runButton(buttonId) {
+  if (navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+
+  try {
+    const response = await fetch(`${endPoint}/run-button?id=${buttonId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    if (response.ok) {
+      console.log(`Button ${buttonId} executed successfully`);
+      showMessage(`Button ${buttonId} executed`);
+    } else {
+      const errorText = await response.text();
+      console.error(`Failed to run button ${buttonId}: ${errorText}`);
+      showMessage(`Failed to run button: ${errorText}`);
+    }
+  } catch (error) {
+    console.error("Error running button:", error);
+    showMessage("Error running button");
+  }
 }
 
 // Send Command to Server
