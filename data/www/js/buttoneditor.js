@@ -222,13 +222,13 @@ function renderList(filteredItems = items) {
     li.style.cursor = "pointer";
     li.style.padding = "8px";
     li.innerHTML = `
-      <span>${item.name}</span>
+      <span>${item.id}. ${item.name}</span>
       <div class="actions" style="display: inline-block; margin-left: 10px;">
         <button class="edit-btn" data-id="${item.id}" aria-label="Edit ${item.name}">Edit</button>
         <button class="delete-btn" data-id="${item.id}" aria-label="Delete ${item.name}">Delete</button>
       </div>
     `;
-
+    
     li.addEventListener("mouseover", () => li.style.backgroundColor = "#222222");
     li.addEventListener("mouseout", () => li.style.backgroundColor = "#1e1e1e");
     li.addEventListener("click", (e) => {

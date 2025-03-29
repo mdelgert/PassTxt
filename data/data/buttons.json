@@ -2,163 +2,106 @@
   "buttons": [
     {
       "id": 1,
-      "name": "CMD",
+      "name": "Ducky Script Command",
       "categoryId": 1,
-      "action": "Command",
-      "command": "DUCKY FILE /scripts/cmd1.txt",
-      "notes": ""
+      "deviceAction": "3",
+      "passwordAction": "1",
+      "command": "",
+      "script": "/scripts/commands.txt",
+      "userName": "",
+      "notes": "Example running commands.txt ducky script."
     },
     {
       "id": 2,
-      "name": "SYSTEM INFO",
+      "name": "Tab After User & Password",
       "categoryId": 1,
-      "action": "Command",
-      "command": "DUCKY FILE /scripts/systeminfo.txt",
-      "notes": ""
+      "deviceAction": "1",
+      "passwordAction": "1",
+      "command": "",
+      "script": "",
+      "userName": "demo",
+      "userPassword": "oOrbTaAxgtjI+dTupAy7A44A6gMxs2eArSmplUvXhsw=",
+      "notes": "Example tab after user name and password."
     },
     {
       "id": 3,
-      "name": "UPDATE WINGET",
+      "name": "Enter After User & Password",
       "categoryId": 1,
-      "action": "Command",
-      "command": "DUCKY FILE /scripts/winget1.txt",
+      "deviceAction": "1",
+      "passwordAction": "2",
+      "command": "",
+      "script": "",
+      "userName": "admin",
+      "userPassword": "vqgaj6nwlIuLiTPmkWsNkr1Vy/VxUofCiNfdygaSCZiw2YZuEN71d3SFYRIRuzdZ",
       "notes": ""
     },
     {
       "id": 4,
-      "name": "NOTEPAD",
+      "name": "None After Password",
       "categoryId": 1,
-      "action": "Command",
-      "command": "DUCKY FILE /scripts/notepad.txt",
+      "deviceAction": "1",
+      "passwordAction": "3",
+      "command": "",
+      "script": "",
+      "userName": "",
+      "userPassword": "BtHK103Eejt2JZ3eyLJ+UBn6Gie+gGR+Wc1mv65AjFU=",
       "notes": ""
     },
     {
       "id": 5,
-      "name": "TFT HELLO",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft print hello",
-      "notes": "Print hello to tft"
+      "name": "Enter After Password",
+      "categoryId": 1,
+      "deviceAction": "1",
+      "passwordAction": "2",
+      "command": "",
+      "script": "",
+      "userName": "",
+      "userPassword": "qZvtgwQa7EVJK/z2UaN63oT+Kw6FzT/eXUAzQEh21/k=",
+      "notes": "Example enter key after password."
     },
     {
       "id": 6,
-      "name": "LOCK IMAGE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft draw lock,45,5,60,60",
-      "notes": ""
+      "name": "Command Led White",
+      "categoryId": 1,
+      "deviceAction": "2",
+      "passwordAction": "1",
+      "command": "led color white",
+      "script": "",
+      "userName": "",
+      "notes": "Example command set led color white."
     },
     {
       "id": 7,
-      "name": "UNLOCK IMAGE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft draw unlock,45,5,60,60",
-      "notes": ""
+      "name": "Command Led Purple",
+      "categoryId": 5,
+      "deviceAction": "2",
+      "passwordAction": "1",
+      "command": "led color purple",
+      "script": "",
+      "userName": "",
+      "notes": "Example command set led color purple."
     },
     {
       "id": 8,
-      "name": "SETTINGS IMAGE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft draw settings,45,5,60,60",
-      "notes": ""
+      "name": "Command Led Off",
+      "categoryId": 5,
+      "deviceAction": "2",
+      "passwordAction": "1",
+      "command": "led color black",
+      "script": "",
+      "userName": "",
+      "notes": "Example command turn led off."
     },
     {
       "id": 9,
-      "name": "WIFI ON IMAGE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft draw wifion,45,5,60,60",
-      "notes": ""
-    },
-    {
-      "id": 10,
-      "name": "WIFI OFF IMAGE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft draw wifioff,45,5,60,60",
-      "notes": ""
-    },
-    {
-      "id": 11,
-      "name": "LED OFF",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "led color black",
-      "notes": "Turn led off"
-    },
-    {
-      "id": 12,
-      "name": "LED ON",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "led color white",
-      "notes": ""
-    },
-    {
-      "id": 13,
-      "name": "JIGGLE ON",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "jiggle true",
-      "notes": ""
-    },
-    {
-      "id": 14,
-      "name": "JIGGLE OFF",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "jiggle false",
-      "notes": ""
-    },
-    {
-      "id": 15,
-      "name": "LED PURPLE",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "led color purple",
-      "notes": ""
-    },
-    {
-      "id": 16,
-      "name": "LED GREEN",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "led color green",
-      "notes": ""
-    },
-    {
-      "id": 17,
-      "name": "SHOW CLOCK",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft clock true",
-      "notes": ""
-    },
-    {
-      "id": 18,
-      "name": "HIDE CLOCK",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "tft clock false",
-      "notes": ""
-    },
-    {
-      "id": 19,
-      "name": "LOCK WINDOWS",
-      "categoryId": 2,
-      "action": "Command",
-      "command": "script file /scripts/lockwindows.txt",
-      "notes": ""
-    },
-    {
-      "id": 20,
-      "name": "CALC",
+      "name": "Ducky Test",
       "categoryId": 1,
-      "action": "Command",
-      "command": "DUCKY FILE /scripts/calc.txt",
-      "notes": ""
+      "deviceAction": "3",
+      "passwordAction": "1",
+      "command": "",
+      "script": "/scripts/test.txt",
+      "userName": "",
+      "notes": "Test ducky script."
     }
   ]
 }
