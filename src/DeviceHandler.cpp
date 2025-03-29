@@ -5,19 +5,20 @@
 #include "DeviceDescriptors.h"
 #include "KeyMappings.h"
 #include <USB.h>
-#include <LittleFS.h> // Added to support LittleFS filesystem operations
+#include <LittleFS.h>
 
+int DeviceHandler::keyPressDelay = 20;
+//int DeviceHandler::keyPressDelay = settings.device.keyPressDelay;
 USBHIDMouse DeviceHandler::mouse;
 USBHIDKeyboard DeviceHandler::keyboard;
-
-int DeviceHandler::keyPressDelay = 20; // Default delay value
 
 USBHIDKeyboard &DeviceHandler::getKeyboard() {
     return keyboard;
 }
 
 void DeviceHandler::setKeyPressDelay(int delay) {
-    keyPressDelay = delay > 0 ? delay : 20; // Ensure delay is positive
+    keyPressDelay = delay > 0 ? delay : 20;
+    //keyPressDelay = delay > 0 ? delay : settings.device.keyPressDelay; // Fallback to default from settings
     debugI("Key press delay set to %d ms", keyPressDelay);
 }
 
@@ -65,6 +66,7 @@ void DeviceHandler::processKey(const String &keyName, bool press) {
 void DeviceHandler::tapKey(const String &keyName) {
     processKey(keyName, true);  // Press
     delay(50);                  // Hold duration
+    //delay(settings.device.keyPressDelay); // Use the configured delay for consistency
     processKey(keyName, false); // Release
 }
 

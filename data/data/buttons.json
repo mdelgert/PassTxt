@@ -109,7 +109,7 @@
       "categoryId": 1,
       "deviceAction": "2",
       "passwordAction": "1",
-      "command": "hid file /data/mqtt1.md",
+      "command": "hid file /data/mqtt1.crt",
       "script": "",
       "userName": "",
       "notes": ""
