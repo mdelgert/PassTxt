@@ -5,10 +5,10 @@
 #include "DeviceDescriptors.h"
 #include "KeyMappings.h"
 #include <USB.h>
+#include <LittleFS.h> // Added to support LittleFS filesystem operations
 
 USBHIDMouse DeviceHandler::mouse;
 USBHIDKeyboard DeviceHandler::keyboard;
-TaskHandle_t sendKeysTaskHandle = nullptr;
 
 int DeviceHandler::keyPressDelay = 20; // Default delay value
 
@@ -29,6 +29,7 @@ void DeviceHandler::init() {
     keyboard.begin();
     registerCommands();
     debugI("DeviceHandler initialized");
+    // Note: Ensure LittleFS.begin() is called somewhere in the setup process if not already done
 }
 
 void DeviceHandler::sendMouseMovement(int x, int y) {
@@ -39,14 +40,14 @@ void DeviceHandler::sendMouseMovement(int x, int y) {
 void DeviceHandler::sendKeys(const String &text) {
     for (size_t i = 0; i < text.length(); i++) {
         keyboard.write(text[i]);
-        delay(keyPressDelay); // Configurable delay
+        delay(keyPressDelay); // Configurable delay between key presses
     }
     debugI("Keys sent: %s", text.c_str());
 }
 
 void DeviceHandler::processKey(const String &keyName, bool press) {
     std::string key = keyName.c_str();
-    auto it = KeyMappings::keyMap.find(key); // Fix: Use KeyMappings::keyMap
+    auto it = KeyMappings::keyMap.find(key);
     if (it != KeyMappings::keyMap.end()) {
         uint8_t keyCode = it->second;
         if (press) {
@@ -124,6 +125,24 @@ void DeviceHandler::registerCommands() {
                 debugW("Invalid delay value. Expected positive integer");
             }
         }
+        else if (cmd == "file") { // New subcommand to handle file typing
+            if (args.isEmpty()) {
+                debugW("No file path provided for HID file command");
+                return;
+            }
+            File file = LittleFS.open(args, "r"); // Open file in read mode
+            if (!file) {
+                debugW("Failed to open file: %s", args.c_str());
+                return;
+            }
+            while (file.available()) {
+                String line = file.readStringUntil('\n'); // Read line up to newline
+                sendKeys(line); // Type out the line
+                keyboard.write('\n'); // Simulate pressing Enter after each line
+            }
+            file.close(); // Close the file
+            debugI("File %s typed out successfully", args.c_str());
+        }
         else {
             debugW("Unknown HID subcommand: %s", cmd.c_str());
         }
@@ -135,7 +154,8 @@ void DeviceHandler::registerCommands() {
     "  winlock - Locks Windows\n"
     "  tapKey <key> - Tap a single key\n"
     "  processKey <key> <press/release> - Press or release a key\n"
-    "  delay <ms> - Set key press delay (default 20 ms)");
+    "  delay <ms> - Set key press delay (default 20 ms)\n"
+    "  file <path> - Type out the contents of the file line by line"); // Updated help string
 }
 
 #endif // ENABLE_DEVICE_HANDLER
