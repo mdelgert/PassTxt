@@ -23,6 +23,7 @@ async function loadSettings() {
     document.getElementById("single_press").value = data.device?.singlePress || "";
     document.getElementById("double_press").value = data.device?.doublePress || "";
     document.getElementById("long_press").value = data.device?.longPress || "";
+    document.getElementById("key_press_delay").value = data.device?.keyPressDelay || 20;
 
     // Device security
     document.getElementById("device_user_name").value = data.device?.userName || "";
@@ -72,6 +73,7 @@ async function saveSettings() {
   const singlePress = document.getElementById("single_press").value.trim();
   const doublePress = document.getElementById("double_press").value.trim();
   const longPress = document.getElementById("long_press").value.trim();
+  const keyPressDelay = parseInt(document.getElementById("key_press_delay").value.trim(), 10) || 20; // Default to 20 if not set
   const timeZone = document.getElementById("time_zone").value.trim();
   const wifiSsid = document.getElementById("wifi_network").value.trim();
   const wifiScan = document.getElementById("wifi_scan").checked;
@@ -105,7 +107,8 @@ async function saveSettings() {
         doublePress: doublePress,
         longPress: longPress,
         userName: deviceUserName,
-        userPassword: deviceUserPassword
+        userPassword: deviceUserPassword,
+        keyPressDelay: keyPressDelay
       },
       wifi: {
         ssid: wifiSsid,
@@ -294,7 +297,5 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Save button not found.");
   }
 });
-
-
 
 */

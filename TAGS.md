@@ -58,3 +58,4 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Description:**
 - Cleanup add password form
 - Cleanup DuckyScript handler
+- Add ability to type out files

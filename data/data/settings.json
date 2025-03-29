@@ -4,6 +4,7 @@
       "setupMode": false,
       "timezone": "America/New_York",
       "defaultTimeout": 500,
+      "keyPressDelay" : 20,
       "bootCount": 0,
       "bootTime": 0,
       "bootCommand": "led color green",

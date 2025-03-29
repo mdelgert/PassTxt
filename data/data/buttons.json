@@ -102,6 +102,17 @@
       "script": "/scripts/test.txt",
       "userName": "",
       "notes": "Test ducky script."
+    },
+    {
+      "id": 10,
+      "name": "Type File",
+      "categoryId": 1,
+      "deviceAction": "2",
+      "passwordAction": "1",
+      "command": "hid file /data/mqtt1.md",
+      "script": "",
+      "userName": "",
+      "notes": ""
     }
   ]
 }

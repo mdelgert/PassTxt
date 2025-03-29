@@ -10,6 +10,7 @@ struct DeviceSettings {
     bool setupMode;
     String timezone;
     int defaultTimeout;
+    int keyPressDelay;
     uint64_t bootCount;
     uint64_t bootTime;
     uint64_t upTime;

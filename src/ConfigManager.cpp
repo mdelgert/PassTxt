@@ -40,6 +40,7 @@ void ConfigManager::load() {
     if (doc["device"]["bootCount"]) settings.device.bootCount = doc["device"]["bootCount"].as<uint64_t>();
     if (doc["device"]["bootTime"]) settings.device.bootTime = doc["device"]["bootTime"].as<uint64_t>();
     if (doc["device"]["defaultTimeout"]) settings.device.defaultTimeout = doc["device"]["defaultTimeout"].as<int>();
+    if (doc["device"]["keyPressDelay"]) settings.device.keyPressDelay = doc["device"]["keyPressDelay"].as<int>();
     
     // Device security
     if (doc["device"]["userName"]) settings.device.userName = doc["device"]["userName"].as<String>();
@@ -91,6 +92,7 @@ void ConfigManager::save() {
     doc["device"]["bootCount"] = settings.device.bootCount;
     doc["device"]["bootTime"] = settings.device.bootTime;
     doc["device"]["defaultTimeout"] = settings.device.defaultTimeout;
+    doc["device"]["keyPressDelay"] = settings.device.keyPressDelay; // Save the key press delay
 
     // Device security
     doc["device"]["userName"] = settings.device.userName;
@@ -170,6 +172,7 @@ void ConfigManager::loadPreferences() {
     settings.device.defaultTimeout = preferences.getInt("defaultTimeout", settings.device.defaultTimeout);
     settings.device.bootCount    = preferences.getULong("bootCount", settings.device.bootCount);
     settings.device.bootTime     = preferences.getULong("bootTime", settings.device.bootTime);
+    settings.device.keyPressDelay = preferences.getInt("keyPressDelay", settings.device.keyPressDelay); // Load the key press delay
 
     // Device security
     settings.device.userName     = preferences.getString("deviceUserName", settings.device.userName);
@@ -217,6 +220,7 @@ void ConfigManager::savePreferences() {
     preferences.putInt("defaultTimeout", settings.device.defaultTimeout);
     preferences.putULong("bootCount", settings.device.bootCount);
     preferences.putULong("bootTime", settings.device.bootTime);
+    preferences.putInt("keyPressDelay", settings.device.keyPressDelay); // Save the key press delay
 
     // Device security
     preferences.putString("deviceUserName", settings.device.userName);
