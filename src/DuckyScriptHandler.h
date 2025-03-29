@@ -9,6 +9,7 @@ class DuckyScriptHandler
 private:
     static void processLine(const String &line);
     static void registerCommands();
+    static void pressKeyCombo(const String &line);
 
 public:
     static void init();

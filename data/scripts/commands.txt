@@ -1,0 +1,24 @@
+REM TEST SCRIPT
+COMMAND tft print blue
+COMMAND mqtt topic passtxt/demo blue
+COMMAND led color blue
+DELAY 1000
+REM turn led off
+COMMAND led color black
+DELAY 1000
+COMMAND tft print purple
+COMMAND mqtt topic passtxt/demo purple
+COMMAND led color purple
+DELAY 1000
+REM turn led off
+COMMAND led color black
+DELAY 1000
+COMMAND tft print pink
+COMMAND mqtt topic passtxt/demo pink
+COMMAND led color pink
+DELAY 1000
+REM turn led off
+COMMAND led color black
+DELAY 1000
+COMMAND mqtt topic passtxt/demo test
+REPEAT 2
