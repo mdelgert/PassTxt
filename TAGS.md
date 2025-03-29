@@ -57,3 +57,4 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Date:** 2025-28-03
 **Description:**
 - Cleanup add password form
+- Cleanup DuckyScript handler
