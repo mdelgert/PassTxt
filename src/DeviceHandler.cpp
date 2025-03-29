@@ -7,7 +7,7 @@
 #include <USB.h>
 #include <LittleFS.h>
 
-int DeviceHandler::keyPressDelay = 20;
+int DeviceHandler::keyPressDelay = 50;
 //int DeviceHandler::keyPressDelay = settings.device.keyPressDelay;
 USBHIDMouse DeviceHandler::mouse;
 USBHIDKeyboard DeviceHandler::keyboard;
