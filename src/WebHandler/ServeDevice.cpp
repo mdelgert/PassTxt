@@ -17,10 +17,10 @@ void ServeDevice::registerEndpoints(AsyncWebServer &server)
     handleDeviceInfo(server);
     handleDeviceReboot(server);
     handleDeviceWifiNetworks(server);
-    handleDeviceTimezones(server);
+    //handleDeviceTimezones(server);
     //handleDeviceBackup(server);
-    handleDeviceFormat(server);
-    handleDeviceOTA(server);
+    //handleDeviceFormat(server);
+    //handleDeviceOTA(server);
 }
 
 void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
@@ -31,18 +31,16 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         debugV("Serving /device/get");
 
         JsonDocument doc;
-
+        
         doc["firmwareVersion"]   = SOFTWARE_VERSION;
         doc["freeHeap"]    = ESP.getFreeHeap();
         doc["heapSize"]    = ESP.getHeapSize();
         doc["maxAllocHeap"]    = ESP.getMaxAllocHeap();
         doc["deviceName"]   = settings.device.name;
         doc["timezone"]    = settings.device.timezone;
-        doc["bootCount"]    = settings.device.bootCount; //Need to cleanup when clock was not set caused reboot loop
+        doc["bootCount"]    = settings.device.bootCount;
         doc["upTime"]    = settings.device.upTime;
-        time_t bootTime = settings.device.bootTime; // Previously saved timestamp
-        String formattedBootTime = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", bootTime);
-        doc["bootTime"] = formattedBootTime;
+        doc["bootTime"] = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", settings.device.bootTime); // Use the saved boot time
         doc["currentTime"]  = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y");
         doc["ssid"]        = WiFi.SSID();
         doc["ip"]          = WiFi.localIP().toString();
@@ -50,6 +48,12 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         doc["rssi"]        = WiFi.RSSI();
         doc["wifiMode"]    = WiFi.getMode();
         doc["wifiChannel"] = WiFi.channel();
+        doc["settingsFile"]     = SETTINGS_FILE;
+        doc["buttonsFile"]      = BUTTONS_FILE;
+        doc["categoriesFile"]   = CATEGORIES_FILE;
+        doc["certFile"]         = EMQX_CERT_FILE;
+        doc["wifiNetworksFile"] = WIFI_NETWORKS_FILE;
+        doc["timezonesFile"]   = TIMEZONES_FILE;
         doc["mqttConnected"] = settings.mqtt.isConnected;
         doc["mqttEnabled"] = settings.mqtt.enabled;
         doc["mqttServer"] = settings.mqtt.server;
