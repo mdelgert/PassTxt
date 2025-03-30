@@ -46,8 +46,16 @@
           </div>
           <div id="passwordFields" class="action-fields">
             <div class="form-group">
-              <label for="editUserName">User Name</label>
+              <label for="editUserName">Username</label>
               <input type="text" id="editUserName" placeholder="e.g., john.doe@example.com" aria-label="User Name">
+            </div>
+            <div class="form-group">
+              <label for="editUsernameAction">Keypress (after username)</label>
+              <select id="editUsernameAction" aria-label="Select username action">
+                <option value="0">None</option>
+                <option value="1">Tab</option>
+                <option value="2">Enter</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="editUserPassword">Password</label>
@@ -69,11 +77,11 @@
               <button type="button" class="generate-password">Generate Password</button>
             </div>
             <div class="form-group">
-              <label for="editPasswordAction">Password Action (Key after user name and password)</label>
+              <label for="editPasswordAction">Keypress (after password)</label>
               <select id="editPasswordAction" aria-label="Select password action">
+                <option value="0">None</option>
                 <option value="1">Tab</option>
                 <option value="2">Enter</option>
-                <option value="3">None</option>
               </select>
             </div>
           </div>
@@ -85,9 +93,7 @@
           </div>
           <div id="new-script-box" class="action-fields hidden">
             <div class="form-group">
-              <label for="editScript" class="required">
-                <label for="editScript" class="required"><a href="/files.html" target="_blank">Script</a></label>
-              </label>
+              <label for="editScript" class="required"><a href="/files.html" target="_blank">Script</a></label>
               <select id="editScript" aria-label="Select script"></select>
             </div>
           </div>

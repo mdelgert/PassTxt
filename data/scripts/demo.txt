@@ -1,4 +1,4 @@
-REM TEST SCRIPT
+REM DUCKY DEMO SCRIPT
 COMMAND tft print blue
 COMMAND mqtt topic passtxt/demo blue
 COMMAND led color blue

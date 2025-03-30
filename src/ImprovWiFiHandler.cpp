@@ -31,7 +31,7 @@ void ImprovWiFiHandler::init()
 
     improvSerial.onImprovError(onImprovWiFiErrorCb);
     improvSerial.onImprovConnected(onImprovWiFiConnectedCb);
-
+        
     if (improvSerial.tryConnectToWifi(settings.wifi.ssid.c_str(), settings.wifi.password.c_str()))
     {
         debugI("Connected to WiFi using saved credentials");

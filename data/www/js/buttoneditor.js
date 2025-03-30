@@ -305,7 +305,8 @@ function openModalForAdd() {
   document.getElementById("editScript").value = "";
   previousCategoryId = categories[0]?.id || "";
   document.getElementById("editDeviceAction").value = "1";
-  document.getElementById("editPasswordAction").value = "1";
+  document.getElementById("editUsernameAction").value = "0";
+  document.getElementById("editPasswordAction").value = "0";
   document.getElementById("editCommand").value = "";
   document.getElementById("editUserName").value = "";
   document.getElementById("editUserPassword").value = "";
@@ -340,6 +341,7 @@ function openModal(id) {
   document.getElementById("editScript").value = item.script || "";
   previousCategoryId = item.categoryId;
   document.getElementById("editDeviceAction").value = item.deviceAction;
+  document.getElementById("editUsernameAction").value = item.usernameAction;
   document.getElementById("editPasswordAction").value = item.passwordAction;
   document.getElementById("editCommand").value = item.command || "";
   document.getElementById("editUserName").value = item.userName || "";
@@ -372,6 +374,7 @@ async function saveChanges() {
   const categoryId = document.getElementById("editCategory").value;
   const script = document.getElementById("editScript").value;
   const deviceAction = document.getElementById("editDeviceAction").value;
+  const usernameAction = document.getElementById("editUsernameAction").value;
   const passwordAction = document.getElementById("editPasswordAction").value;
   const command = document.getElementById("editCommand").value;
   const userName = document.getElementById("editUserName").value;
@@ -403,6 +406,7 @@ async function saveChanges() {
     name,
     categoryId: parseInt(categoryId),
     deviceAction,
+    usernameAction,
     passwordAction,
     command,
     script,
