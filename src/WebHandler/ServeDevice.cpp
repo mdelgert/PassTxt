@@ -35,6 +35,7 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         doc["firmwareVersion"]   = SOFTWARE_VERSION;
         doc["freeHeap"]    = ESP.getFreeHeap();
         doc["heapSize"]    = ESP.getHeapSize();
+        doc["maxAllocHeap"]    = ESP.getMaxAllocHeap();
         doc["deviceName"]   = settings.device.name;
         doc["timezone"]    = settings.device.timezone;
         doc["bootCount"]    = settings.device.bootCount; //Need to cleanup when clock was not set caused reboot loop
