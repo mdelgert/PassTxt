@@ -155,6 +155,30 @@
       "script": "",
       "userName": "",
       "notes": ""
+    },
+    {
+      "id": 14,
+      "name": "CERT1",
+      "categoryId": 5,
+      "deviceAction": "2",
+      "usernameAction": "0",
+      "passwordAction": "0",
+      "command": "hid file /data/mqtt1.crt",
+      "script": "",
+      "userName": "",
+      "notes": ""
+    },
+    {
+      "id": 15,
+      "name": "CERT2",
+      "categoryId": 5,
+      "deviceAction": "2",
+      "usernameAction": "0",
+      "passwordAction": "0",
+      "command": "hid file /data/mqtt2.crt",
+      "script": "",
+      "userName": "",
+      "notes": ""
     }
   ]
 }
