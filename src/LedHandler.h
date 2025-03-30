@@ -2,10 +2,8 @@
 
 #ifdef ENABLE_LED_HANDLER
 
-#include "LedColorMap.h"
 #include <FastLED.h>
 
-// LED configuration
 #define NUM_LEDS 1
 #define LED_TYPE APA102
 #define COLOR_ORDER BGR
@@ -13,16 +11,9 @@
 class LedHandler
 {
 public:
-    // Initialize the LED handler
     static void init();
-
-    // Turn off all LEDs
     static void clear();
-
-    // Set default brightness
     static void setDefaultBrightness(uint8_t brightness);
-
-    // Set LED color by name (e.g., "Red", "Blue")
     static void setColorByName(const String &colorName, uint8_t brightness = defaultBrightness);
 private:
     static CRGB leds[NUM_LEDS];       // Static array for LED data

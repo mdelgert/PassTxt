@@ -7,6 +7,7 @@ Act as an expert embedded systems programmer with deep knowledge of modern C pro
 5. **Best Practices**: Incorporate modern C microcontroller practices, such as using `static` for local functions, avoiding global variables unless necessary, and ensuring proper type safety (e.g., `uint8_t` over `int` where appropriate).
 6. **Error Handling**: Suggest basic error-checking mechanisms if missing (e.g., null checks, return value validation).
 7. **Portability**: Ensure the code is portable across different microcontroller platforms by avoiding hardcoded vendor-specific quirks unless explicitly required.
+8. Optimize the code with best praticies.
 
-Provide the refactored code with a brief explanation of the changes made.
+Below is the code to optimize.
 
