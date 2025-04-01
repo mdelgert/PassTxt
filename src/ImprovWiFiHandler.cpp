@@ -32,25 +32,33 @@ void ImprovWiFiHandler::init()
     improvSerial.onImprovError(onImprovWiFiErrorCb);
     improvSerial.onImprovConnected(onImprovWiFiConnectedCb);
         
-    if (improvSerial.tryConnectToWifi(settings.wifi.ssid.c_str(), settings.wifi.password.c_str()))
+    //if (improvSerial.tryConnectToWifi(settings.wifi.ssid.c_str(), settings.wifi.password.c_str()))
+    if (improvSerial.tryConnectToWifi(deviceConfig.getWifiSsid(), deviceConfig.getWifiPassword()))
     {
         debugI("Connected to WiFi using saved credentials");
         String ipAddress = WiFi.localIP().toString();
         debugI("IP: %s", ipAddress.c_str());
         GfxHandler::printMessage("IP: " + ipAddress);
         RemoteDebugHandler::startNetwork();
-        MDNS.begin(settings.device.name);
+        //MDNS.begin(settings.device.name);
+        MDNS.begin(deviceConfig.getDeviceName());
         MDNS.addService("_http", "_tcp", 80);
         debugI("Wifi connected MDNS responder started!");
     }
     else
     {
         WiFi.mode(WIFI_AP);
-        if (WiFi.softAP(settings.device.name))
+        //if (WiFi.softAP(settings.device.name))
+        if (WiFi.softAP(deviceConfig.getDeviceName()))
         {
             WiFi.softAPConfig(apIP, apIP, netMsk);
-            debugI("Access Point started. SSID: %s", settings.device.name.c_str());
-            GfxHandler::printMessage("Access Point started. SSID: " + settings.device.name);
+
+            //debugI("Access Point started. SSID: %s", settings.device.name.c_str());
+            debugI("Access Point started. SSID: %s", deviceConfig.getDeviceName());
+
+            //GfxHandler::printMessage("Access Point started. SSID: " + settings.device.name);
+            GfxHandler::printMessage(String("Access Point started. SSID: ") + deviceConfig.getDeviceName());
+            
             debugI("AP IP: %s", apIP.toString().c_str());
             GfxHandler::printMessage("AP IP: " + apIP.toString());
         }
@@ -71,9 +79,14 @@ void ImprovWiFiHandler::onImprovWiFiErrorCb(ImprovTypes::Error err)
 
 void ImprovWiFiHandler::onImprovWiFiConnectedCb(const char *ssid, const char *password)
 {
-    settings.wifi.ssid = String(ssid);
-    settings.wifi.password = String(password);
-    ConfigManager::save();
+    //settings.wifi.ssid = String(ssid);
+    deviceConfig.setWifiSsid(ssid);
+    
+    //settings.wifi.password = String(password);
+    deviceConfig.setWifiPassword(password);
+    
+    //ConfigManager::save();
+
     debugD("WiFi credentials saved to preferences. SSID: %s", ssid);
     GfxHandler::printMessage("Rebooting...");
     debugI("Rebooting...");
@@ -83,7 +96,8 @@ void ImprovWiFiHandler::onImprovWiFiConnectedCb(const char *ssid, const char *pa
 
 void ImprovWiFiHandler::scanAndSaveNetworks()
 {
-    if (settings.wifi.scan == false)
+    //if (settings.wifi.scan == false)
+    if (!deviceConfig.getWifiScan())
     {
         debugI("Wi-Fi scan disabled");
         return;

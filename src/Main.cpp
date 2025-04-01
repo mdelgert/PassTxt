@@ -24,11 +24,12 @@
 
 void setup()
 {
+  deviceConfig.begin(); // Load settings from NVS
   RemoteDebugHandler::init();
   LittleFsHandler::init();
   ScriptHandler::init();
   DuckyScriptHandler::init();
-  ConfigManager::init();
+  //ConfigManager::init();
   GfxHandler::init();
   ImprovWiFiHandler::init();
   WebHandler::init();
@@ -42,11 +43,16 @@ void setup()
   DownloadHandler::init();
   AesHandler::init();
   CryptoHandler::init();
-  TimeHandler::init(settings.device.timezone);
+
+  //TimeHandler::init(settings.device.timezone);
+  TimeHandler::init(deviceConfig.getDeviceTimezone());
+  
   JiggleHandler::init();
   BluetoothHandler::init();
   MqttHandler::init();
-  CommandHandler::handleCommand(settings.device.bootCommand);
+  
+  //CommandHandler::handleCommand(settings.device.bootCommand);
+  CommandHandler::handleCommand(deviceConfig.getDeviceBootCommand());
   
   //GfxHandler::printMessage(SOFTWARE_VERSION);
   //LedHandler::setDefaultBrightness(50);

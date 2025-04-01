@@ -58,7 +58,8 @@ void BluetoothHandler::init()
     debugI("Initializing BluetoothHandler...");
 
     // Initialize BLE
-    NimBLEDevice::init(settings.deviceName.c_str());
+    //NimBLEDevice::init(settings.deviceName.c_str());
+    NimBLEDevice::init(deviceConfig.getDeviceName());
     pServer = NimBLEDevice::createServer();
 
     // Attach server callbacks

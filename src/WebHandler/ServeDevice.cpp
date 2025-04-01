@@ -36,11 +36,22 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         doc["freeHeap"]    = ESP.getFreeHeap();
         doc["heapSize"]    = ESP.getHeapSize();
         doc["maxAllocHeap"]    = ESP.getMaxAllocHeap();
-        doc["deviceName"]   = settings.device.name;
-        doc["timezone"]    = settings.device.timezone;
-        doc["bootCount"]    = settings.device.bootCount;
-        doc["upTime"]    = settings.device.upTime;
-        doc["bootTime"] = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", settings.device.bootTime); // Use the saved boot time
+
+        //doc["deviceName"]   = settings.device.name;
+        doc["deviceName"]   = deviceConfig.getDeviceName();
+        
+        //doc["timezone"]    = settings.device.timezone;
+        doc["timezone"]    = deviceConfig.getDeviceTimezone();
+
+        //doc["bootCount"]    = settings.device.bootCount;
+        doc["bootCount"]    = deviceConfig.getDeviceBootCount();
+
+        //doc["upTime"]    = settings.device.upTime;
+        doc["upTime"]    = deviceConfig.getDeviceUpTime();
+        
+        //doc["bootTime"] = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", settings.device.bootTime); // Use the saved boot time
+        doc["bootTime"] = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y", deviceConfig.getDeviceBootTime()); // Use the saved boot time
+        
         doc["currentTime"]  = TimeHandler::formatDateTime("%I:%M:%S %p %m-%d-%Y");
         doc["ssid"]        = WiFi.SSID();
         doc["ip"]          = WiFi.localIP().toString();
@@ -54,13 +65,28 @@ void ServeDevice::handleDeviceInfo(AsyncWebServer &server)
         doc["certFile"]         = EMQX_CERT_FILE;
         doc["wifiNetworksFile"] = WIFI_NETWORKS_FILE;
         doc["timezonesFile"]   = TIMEZONES_FILE;
-        doc["mqttConnected"] = settings.mqtt.isConnected;
-        doc["mqttEnabled"] = settings.mqtt.enabled;
-        doc["mqttServer"] = settings.mqtt.server;
-        doc["mqttPort"] = settings.mqtt.port;
-        doc["mqttSsl"] = settings.mqtt.ssl;
-        doc["mqttSubTopic"] = settings.mqtt.subTopic;
-        doc["mqttPubTopic"] = settings.mqtt.pubTopic;
+
+        //doc["mqttConnected"] = settings.mqtt.isConnected;
+        doc["mqttConnected"] = deviceConfig.getMqttIsConnected();
+        
+        //doc["mqttEnabled"] = settings.mqtt.enabled;
+        doc["mqttEnabled"] = deviceConfig.getMqttEnabled();
+
+        //doc["mqttServer"] = settings.mqtt.server;
+        doc["mqttServer"] = deviceConfig.getMqttServer();
+
+        //doc["mqttPort"] = settings.mqtt.port;
+        doc["mqttPort"] = deviceConfig.getMqttPort();
+
+        //doc["mqttSsl"] = settings.mqtt.ssl;
+        doc["mqttSsl"] = deviceConfig.getMqttSsl();
+
+        //doc["mqttSubTopic"] = settings.mqtt.subTopic;
+        doc["mqttSubTopic"] = deviceConfig.getMqttSubTopic();
+
+        //doc["mqttPubTopic"] = settings.mqtt.pubTopic;
+        doc["mqttPubTopic"] = deviceConfig.getMqttPubTopic();
+
         doc["tickRateHz"] = configTICK_RATE_HZ;
         doc["chipModel"]   = ESP.getChipModel();
         doc["chipRevision"] = (int)ESP.getChipRevision();

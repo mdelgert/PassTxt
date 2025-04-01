@@ -47,19 +47,22 @@ void ButtonHandler::loop()
 void ButtonHandler::handleSingleClick()
 {
     debugI("Single click.");
-    CommandHandler::handleCommand(settings.device.singlePress);
+    //CommandHandler::handleCommand(settings.device.singlePress);
+    CommandHandler::handleCommand(deviceConfig.getDeviceSinglePress());
 }
 
 void ButtonHandler::handleDoubleClick()
 {
     debugI("Double click.");
-    CommandHandler::handleCommand(settings.device.doublePress);
+    //CommandHandler::handleCommand(settings.device.doublePress);
+    CommandHandler::handleCommand(deviceConfig.getDeviceDoublePress());
 }
 
 void ButtonHandler::handleLongPress()
 {
     debugI("Long press started.");
-    CommandHandler::handleCommand(settings.device.longPress);
+    //CommandHandler::handleCommand(settings.device.longPress);
+    CommandHandler::handleCommand(deviceConfig.getDeviceLongPress());
     longPressStartTime = millis(); // Record the start time of the long press
     rebootTriggered = false; // Reset the reboot flag
     lastCountdownValue = -1; // Reset the countdown value
@@ -95,7 +98,8 @@ void ButtonHandler::handleDuringLongPress()
         rebootTriggered = true; // Set the flag to prevent multiple reboots
         LedHandler::setColorByName("purple");
         GfxHandler::printMessage("Clearing preferences...");
-        ConfigManager::clearPreferences(); // Clear all preferences
+        //ConfigManager::clearPreferences(); // Clear all preferences
+        deviceConfig.clear(); // Clear all settings
         delay(1000); // Brief delay to ensure the message is displayed
         GfxHandler::printMessage("Rebooting now...");
         delay(1000); // Brief delay to ensure the message is displayed
@@ -160,7 +164,8 @@ void ButtonHandler::executeButtonAction(const JsonObject& button) {
 
         String decryptedPassword = CryptoHandler::decryptAES(
             button["userPassword"].as<String>(), 
-            settings.device.userPassword
+            //settings.device.userPassword
+            deviceConfig.getDeviceUserPassword()
         );
         
         DeviceHandler::sendKeys(decryptedPassword);

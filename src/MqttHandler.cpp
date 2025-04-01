@@ -19,7 +19,8 @@ static NonBlockingTimer mqttReconnectTimer(DEFAULT_TIMEOUT_MS);
 static uint32_t currentBackoffMs = DEFAULT_TIMEOUT_MS;  // Tracks current delay
 
 void MqttHandler::init() {
-  if (!settings.mqtt.enabled) {
+  //if (!settings.mqtt.enabled) {
+  if (!deviceConfig.getMqttEnabled()) {
     return;
   }
 
@@ -28,14 +29,18 @@ void MqttHandler::init() {
 }
 
 void MqttHandler::loop() {
-  if (!settings.mqtt.enabled) {
+  //if (!settings.mqtt.enabled) {
+  if (!deviceConfig.getMqttEnabled()) {
     return;
   }
 
   if (!mqttClient.connected()) {
     if (mqttReconnectTimer.isReady()) {
       debugW("MQTT: Disconnected, attempting to reconnect with backoff=%d ms", currentBackoffMs);
-      settings.mqtt.isConnected = false;
+      
+      //settings.mqtt.isConnected = false;
+      deviceConfig.setMqttIsConnected(false);
+      
       connectToMqtt();
     }
   } else {
@@ -82,7 +87,8 @@ bool MqttHandler::loadCertificate(String& certContent) {
 
 void MqttHandler::connectToMqtt() {
   // Configure client based on SSL setting
-  if (settings.mqtt.ssl) {
+  //if (settings.mqtt.ssl) {
+  if (deviceConfig.getMqttSsl()) {
     debugI("MQTT: Configuring secure connection");
     String certContent;
     if (!loadCertificate(certContent)) {
@@ -96,31 +102,55 @@ void MqttHandler::connectToMqtt() {
   }
 
   // Set server and callback
-  mqttClient.setServer(settings.mqtt.server.c_str(), settings.mqtt.port);
+  //mqttClient.setServer(settings.mqtt.server.c_str(), settings.mqtt.port);
+  mqttClient.setServer(deviceConfig.getMqttServer(), deviceConfig.getMqttPort());
+
   mqttClient.setCallback(handleMqttCallback);
 
-  debugI("MQTT: Connecting to %s:%d", settings.mqtt.server.c_str(), settings.mqtt.port);
+  //debugI("MQTT: Connecting to %s:%d", settings.mqtt.server.c_str(), settings.mqtt.port);
+  debugI("MQTT: Connecting to %s:%d", deviceConfig.getMqttServer(), deviceConfig.getMqttPort());
 
   // Attempt connection with or without credentials
   bool success = false;
-  if (!settings.mqtt.username.isEmpty() || !settings.mqtt.password.isEmpty()) {
-    debugI("MQTT: Connecting with credentials: [%s]", settings.mqtt.username.c_str());
-    success = mqttClient.connect(settings.device.name.c_str(), 
-                                settings.mqtt.username.c_str(), 
-                                settings.mqtt.password.c_str());
+
+  //if (!settings.mqtt.username.isEmpty() || !settings.mqtt.password.isEmpty()) {
+  if (strlen(deviceConfig.getMqttUsername()) > 0 || strlen(deviceConfig.getMqttPassword()) > 0) {
+    
+    //debugI("MQTT: Connecting with credentials: [%s]", settings.mqtt.username.c_str());
+    debugI("MQTT: Connecting with credentials: [%s]", deviceConfig.getMqttUsername());
+
+    // success = mqttClient.connect(settings.device.name.c_str(), 
+    //                             settings.mqtt.username.c_str(), 
+    //                             settings.mqtt.password.c_str());
+
+    success = mqttClient.connect(deviceConfig.getDeviceName(), 
+                                deviceConfig.getMqttUsername(), 
+                                deviceConfig.getMqttPassword());
   } else {
     debugI("MQTT: Connecting without credentials");
-    success = mqttClient.connect(settings.device.name.c_str());
+    //success = mqttClient.connect(settings.device.name.c_str());
+    success = mqttClient.connect(deviceConfig.getDeviceName());
   }
 
   if (success) {
-    debugI("MQTT: Connected as [%s]", settings.device.name.c_str());
-    mqttClient.subscribe(settings.mqtt.subTopic.c_str());
-    debugI("MQTT: Subscribed to [%s]", settings.mqtt.subTopic.c_str());
+    //debugI("MQTT: Connected as [%s]", settings.device.name.c_str());
+    debugI("MQTT: Connected as [%s]", deviceConfig.getDeviceName());
 
-    String helloMessage = "Device: " + settings.device.name + " connected.";
-    publish(settings.mqtt.pubTopic.c_str(), helloMessage.c_str());
-    settings.mqtt.isConnected = true;
+    //mqttClient.subscribe(settings.mqtt.subTopic.c_str());
+    mqttClient.subscribe(deviceConfig.getMqttSubTopic());
+
+    //debugI("MQTT: Subscribed to [%s]", settings.mqtt.subTopic.c_str());
+    debugI("MQTT: Subscribed to [%s]", deviceConfig.getMqttSubTopic());
+
+    //String helloMessage = "Device: " + settings.device.name + " connected.";
+    //publish(settings.mqtt.pubTopic.c_str(), helloMessage.c_str());
+
+    char message[128];
+    snprintf(message, sizeof(message), "%s Device connected.", deviceConfig.getDeviceName());
+    publish(deviceConfig.getMqttPubTopic(), message);
+
+    //settings.mqtt.isConnected = true;
+    deviceConfig.setMqttIsConnected(true);
 
     // Reset backoff and timer on success
     currentBackoffMs = DEFAULT_TIMEOUT_MS;
@@ -141,15 +171,20 @@ void MqttHandler::handleMqttCallback(char* topic, uint8_t* payload, uint32_t len
 
   String message;
   message.reserve(length);  // Pre-allocate for efficiency
+
   for (uint32_t i = 0; i < length; i++) {
     message += static_cast<char>(payload[i]);
   }
 
   debugI("MQTT: Received on [%s]: %s", topic, message.c_str());
 
-  if (String(topic) == settings.mqtt.subTopic) {
+  //if (String(topic) == settings.mqtt.subTopic) {
+  if (String(topic) == deviceConfig.getMqttSubTopic()) {
     debugD("MQTT: Echoing message to publish topic");
-    publish(settings.mqtt.pubTopic.c_str(), message.c_str());
+
+    //publish(settings.mqtt.pubTopic.c_str(), message.c_str());
+    publish(deviceConfig.getMqttPubTopic(), message.c_str());
+
     CommandHandler::handleCommand(message);
   }
 }
@@ -162,7 +197,10 @@ void MqttHandler::registerCommands() {
         CommandHandler::parseCommand(command, cmd, args);
 
         if (CommandHandler::equalsIgnoreCase(cmd, "msg")) {
-          MqttHandler::publish(settings.mqtt.pubTopic.c_str(), args.c_str());
+
+          //MqttHandler::publish(settings.mqtt.pubTopic.c_str(), args.c_str());
+          MqttHandler::publish(deviceConfig.getMqttPubTopic(), args.c_str());
+
         } else if (CommandHandler::equalsIgnoreCase(cmd, "topic")) {
           int32_t delimiterPos = args.indexOf(' ');
           if (delimiterPos == -1) {

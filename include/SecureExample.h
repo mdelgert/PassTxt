@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 
-// ----> Moved to /data/settings.json
-/*
 #define SECURE_DEVICE_NAME "demo"
 #define SECURE_WIFI_SSID ""
 #define SECURE_WIFI_PASSWORD ""
@@ -17,7 +15,6 @@
 #define SECURE_MQTT_SSL true
 #define SECURE_API_KEY "password"
 #define SECURE_OTA_PASSWORD "password"
-*/
 
 /*
 // ----> Moved to /data/mqtt.crt

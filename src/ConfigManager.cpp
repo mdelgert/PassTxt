@@ -1,3 +1,4 @@
+/*
 #include "ConfigManager.h"
 #include <LittleFS.h>
 #include <ArduinoJson.h>
@@ -267,3 +268,4 @@ void ConfigManager::clearPreferences() {
     settings = Settings(); // reset to defaults
     debugI("ConfigManager cleared preferences in namespace: %s", ns);
 }
+*/

@@ -70,6 +70,76 @@ void DeviceHandler::tapKey(const String &keyName) {
     processKey(keyName, false); // Release
 }
 
+void DeviceHandler::printFile1(const char *filePath) {
+
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        Serial.println("Failed to open filePath for reading");
+        return;
+    }
+
+    // Ensure USB HID is fully initialized
+    //delay(1000);
+    //keyboard.begin();
+    file.seek(0);
+
+    // Buffer small chunks to avoid timing issues
+    const size_t BUFFER_SIZE = 32; // Small to stay memory-safe
+    char buffer[BUFFER_SIZE + 1];  // +1 for null terminator
+    size_t bytesRead;
+
+    while (file.available()) {
+        bytesRead = file.readBytes(buffer, BUFFER_SIZE);
+        buffer[bytesRead] = '\0'; // Null-terminate for safety
+
+        for (size_t i = 0; i < bytesRead; i++) {
+            if (buffer[i] != '\r') {
+                //keyboard.print(buffer[i]);
+                keyboard.write(buffer[i]);
+                //yield(); // Allow other tasks to run
+                //delay(50); // Keep max delay for now
+            }
+        }
+        //delay(100); // Extra delay between chunks
+    }
+
+    file.close();
+    //keyboard.println();
+    keyboard.write('\n');
+}
+
+void DeviceHandler::printFile2(const char *filePath) {
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        // Serial.println("Failed to open filePath for reading");
+        return;
+    }
+
+    // Ensure USB HID is fully initialized
+    delay(1000); // Increased delay to give USB more time
+    //USB.begin();
+    //keyboard.begin(); // Reinitialize keyboard to ensure buffer is clear
+
+    // Reset file pointer to start
+    file.seek(0);
+
+    while (file.available()) {
+        char c = file.read();
+        if (c != '\r') { // Skip carriage returns, if any
+            keyboard.write(c);
+            //keyboard.print(c);
+            // Serial.print(c); // Commented out to test without Serial interference
+            //delay(50);
+            //yield(); // Allow other tasks to run       
+        }
+    }
+
+    file.close();
+    keyboard.write('\n'); // Ensure final newline
+    //keyboard.println(); // Move to the next line after sending the file content
+    // Serial.println();
+}
+
 void DeviceHandler::registerCommands() {
     CommandHandler::registerCommand("hid", [](const String &command) {
         String cmd, args;
@@ -131,18 +201,8 @@ void DeviceHandler::registerCommands() {
             if (args.isEmpty()) {
                 debugW("No file path provided for HID file command");
                 return;
-            }
-            File file = LittleFS.open(args, "r"); // Open file in read mode
-            if (!file) {
-                debugW("Failed to open file: %s", args.c_str());
-                return;
-            }
-            while (file.available()) {
-                String line = file.readStringUntil('\n'); // Read line up to newline
-                sendKeys(line); // Type out the line
-                keyboard.write('\n'); // Simulate pressing Enter after each line
-            }
-            file.close(); // Close the file
+            }         
+            printFile1(args.c_str());
             debugI("File %s typed out successfully", args.c_str());
         }
         else {

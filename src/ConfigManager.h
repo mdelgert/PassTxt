@@ -1,3 +1,4 @@
+/*
 #pragma once
 
 #include "Globals.h"
@@ -81,3 +82,4 @@ private:
     static void loadPreferences();
     static Preferences preferences;
 };
+*/

@@ -148,7 +148,10 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
                                 if (!existingButton["userPassword"].is<String>() || existingButton["userPassword"].as<String>().isEmpty()) {
                                     // No prior password; treat as plaintext and encrypt
                                     debugV("No prior password for ID: %d; encrypting new password", existingButton["id"].as<int>());
-                                    String encryptedPassword = CryptoHandler::encryptAES(newPassword, settings.device.userPassword);
+
+                                    //String encryptedPassword = CryptoHandler::encryptAES(newPassword, settings.device.userPassword);
+                                    String encryptedPassword = CryptoHandler::encryptAES(newPassword, deviceConfig.getDeviceUserPassword());
+                                    
                                     existingButton["userPassword"] = encryptedPassword;
                                 } else {
                                     // Password exists; assume incoming is encrypted and store as-is
@@ -192,7 +195,10 @@ void ServeButtons::handlePostButtons(AsyncWebServerRequest *request, uint8_t *da
                     String plainPassword = buttonToAdd["userPassword"].as<String>();
                     if (!plainPassword.isEmpty()) {
                         debugV("Encrypting password for new button ID: %d", newId);
-                        String encryptedPassword = CryptoHandler::encryptAES(plainPassword, settings.device.userPassword);
+                        
+                        //String encryptedPassword = CryptoHandler::encryptAES(plainPassword, settings.device.userPassword);
+                        String encryptedPassword = CryptoHandler::encryptAES(plainPassword, deviceConfig.getDeviceUserPassword());
+
                         buttonToAdd["userPassword"] = encryptedPassword;
                     } else {
                         debugV("Empty password removed for new button ID: %d", newId);

@@ -6,8 +6,8 @@
 #define BUTTONS_FILE "/data/buttons.json"
 //#define BUTTONS_FILE "/data/buttonsSecure.json"
 
-#define SETTINGS_FILE "/data/settings.json"
-//#define SETTINGS_FILE "/data/settingsSecure.json"
+//#define SETTINGS_FILE "/data/settings.json"
+#define SETTINGS_FILE "/data/settingsSecure.json"
 
 #define EMQX_CERT_FILE "/data/mqtt1.crt"
 #define TIMEZONES_FILE "/data/timezones.json"
@@ -17,10 +17,11 @@
 #define CUSTOM_MANUFACTURER "Passtxt"
 #define CUSTOM_SERIAL_NUMBER "123456789"
 
-//#include "Secure.h"
-#include "SecureExample.h"
-#include "ConfigManager.h"
+#include "Secure.h"
+//#include "SecureExample.h"
+//#include "ConfigManager.h"
 #include "NonBlockingTimer.h"
 #include "RemoteDebugHandler.h"
 #include "BoardPins.h"
 #include "CommandHandler.h"
+#include "DeviceConfig.h"
