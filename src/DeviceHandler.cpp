@@ -116,7 +116,7 @@ void DeviceHandler::printFile2(const char *filePath) {
     }
 
     // Ensure USB HID is fully initialized
-    delay(1000); // Increased delay to give USB more time
+    //delay(1000); // Increased delay to give USB more time
     //USB.begin();
     //keyboard.begin(); // Reinitialize keyboard to ensure buffer is clear
 
@@ -202,7 +202,7 @@ void DeviceHandler::registerCommands() {
                 debugW("No file path provided for HID file command");
                 return;
             }         
-            printFile1(args.c_str());
+            printFile2(args.c_str());
             debugI("File %s typed out successfully", args.c_str());
         }
         else {
