@@ -13,6 +13,9 @@ private:
     static void registerCommands();
     static void printFile1(const char *filePath);
     static void printFile2(const char *filePath);
+    static void printFile3(const char *filePath);
+    static void printFile4(const char *filePath);
+    static void printFile5(const char *filePath);
 
 public:
     static void sendMouseMovement(int x, int y);

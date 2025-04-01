@@ -64,4 +64,5 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 ### Tag: v1.0.8
 **Date:** 2025-30-03
 **Description:**
+- Upgrade espressif32@6.10.0
 - Cleanup settings heap stack
