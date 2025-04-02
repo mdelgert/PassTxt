@@ -70,6 +70,27 @@ void DeviceHandler::tapKey(const String &keyName) {
     processKey(keyName, false); // Release
 }
 
+void DeviceHandler::printFile(const char *filePath) {
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    // Reset file pointer to start
+    file.seek(0);
+
+    while (file.available()) {
+        char c = file.read();
+        if (c != '\r') {
+            keyboard.print(c);   
+        }
+    }
+
+    file.close();
+    keyboard.println();
+}
+
 void DeviceHandler::registerCommands() {
     CommandHandler::registerCommand("hid", [](const String &command) {
         String cmd, args;
@@ -132,17 +153,8 @@ void DeviceHandler::registerCommands() {
                 debugW("No file path provided for HID file command");
                 return;
             }
-            File file = LittleFS.open(args, "r"); // Open file in read mode
-            if (!file) {
-                debugW("Failed to open file: %s", args.c_str());
-                return;
-            }
-            while (file.available()) {
-                String line = file.readStringUntil('\n'); // Read line up to newline
-                sendKeys(line); // Type out the line
-                keyboard.write('\n'); // Simulate pressing Enter after each line
-            }
-            file.close(); // Close the file
+            
+            printFile(args.c_str());
             debugI("File %s typed out successfully", args.c_str());
         }
         else {
@@ -161,3 +173,176 @@ void DeviceHandler::registerCommands() {
 }
 
 #endif // ENABLE_DEVICE_HANDLER
+
+/*
+void DeviceHandler::printFile1(const char *filePath) {
+
+    // Note if windows notepad spell check is enabled, it will not work
+    // Tested with notepad++ and it works
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    // Tested works without this day
+    delay(1000);
+    keyboard.begin();
+    file.seek(0);
+
+    // Buffer small chunks to avoid timing issues
+    const size_t BUFFER_SIZE = 32; // Small to stay memory-safe
+    char buffer[BUFFER_SIZE + 1];  // +1 for null terminator
+    size_t bytesRead;
+
+    while (file.available()) {
+        bytesRead = file.readBytes(buffer, BUFFER_SIZE);
+        buffer[bytesRead] = '\0'; // Null-terminate for safety
+
+        for (size_t i = 0; i < bytesRead; i++) {
+            if (buffer[i] != '\r') {
+                //keyboard.print(buffer[i]);
+                keyboard.write(buffer[i]);
+                //yield(); // Works without this delay
+                //delay(50); // Keep max delay for now
+            }
+        }
+        //delay(100); // Extra delay between chunks
+    }
+
+    file.close();
+    //keyboard.println();
+    keyboard.write('\n');
+}
+
+void DeviceHandler::printFile2(const char *filePath) {
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    // Reset file pointer to start
+    file.seek(0);
+
+    while (file.available()) {
+        char c = file.read();
+        if (c != '\r') { // Skip carriage returns, if any
+            //keyboard.write(c);
+            keyboard.print(c);
+            //debugI(c);
+            //delay(50); // It's working without this delay
+            //yield(); // It's working without this delay     
+        }
+    }
+
+    file.close();
+    //keyboard.write('\n'); // Ensure final newline
+    keyboard.println(); // Move to the next line after sending the file content
+}
+
+void DeviceHandler::printFile3(const char *filePath) {
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    // Initial delay for USB HID stability
+    //delay(500);
+    keyboard.begin();
+    file.seek(0);
+
+    // Buffer setup
+    const size_t BUFFER_SIZE = 32; // Matches USB HID buffer size nicely
+    char buffer[BUFFER_SIZE + 1];  // +1 for null terminator
+    size_t bytesRead;
+
+    while (file.available()) {
+        bytesRead = file.readBytes(buffer, BUFFER_SIZE);
+        buffer[bytesRead] = '\0'; // Ensure null termination
+
+        for (size_t i = 0; i < bytesRead; i++) {
+            if (buffer[i] != '\r') { // Skip carriage returns
+                keyboard.print(buffer[i]); // Reliable for ASCII
+                //delay(20); // ~50 chars/sec, safe for Notepad spell check
+            }
+        }
+        //delay(50); // Pause between chunks
+    }
+
+    file.close();
+    keyboard.println(); // Consistent newline
+}
+
+void DeviceHandler::printFile4(const char *filePath) {
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    // Reset file pointer to start
+    file.seek(0);
+
+    while (file.available()) {
+        char c = file.read();
+        if (c != '\r') {
+            keyboard.print(c);   
+        }
+    }
+
+    file.close();
+    keyboard.println();
+}
+
+void DeviceHandler::printFile5(const char *filePath) {
+    // First pass: Count total lines
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        debugE("Failed to open file %s for reading", filePath);
+        return;
+    }
+
+    size_t totalLines = 0;
+    while (file.available()) {
+        file.readStringUntil('\n'); // Skip to next line
+        totalLines++;
+    }
+    file.close();
+
+    // Second pass: Print in batches of 10 lines
+    const size_t BATCH_SIZE = 10;
+    size_t linesPrinted = 0;
+
+    while (linesPrinted < totalLines) {
+        file = LittleFS.open(filePath, "r");
+        if (!file) {
+            debugE("Failed to reopen file %s", filePath);
+            return;
+        }
+
+        // Skip to the current line offset
+        for (size_t i = 0; i < linesPrinted && file.available(); i++) {
+            file.readStringUntil('\n');
+        }
+
+        // Print up to BATCH_SIZE lines
+        size_t linesInBatch = 0;
+        while (file.available() && linesInBatch < BATCH_SIZE) {
+            String line = file.readStringUntil('\n');
+            line.trim(); // Remove \r or trailing spaces
+            for (size_t i = 0; i < line.length(); i++) {
+                keyboard.print(line[i]);
+                delay(20); // Pace for Notepad spell check
+            }
+            keyboard.println(); // Newline after each line
+            linesInBatch++;
+            linesPrinted++;
+        }
+
+        file.close();
+        delay(100); // Pause between batches
+    }
+}
+*/

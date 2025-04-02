@@ -11,6 +11,7 @@ private:
     static USBHIDMouse mouse;
     static USBHIDKeyboard keyboard;
     static void registerCommands();
+    static void printFile(const char *filePath);
     
 public:
     static void sendMouseMovement(int x, int y);

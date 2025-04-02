@@ -62,6 +62,16 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 - Add samples
 
 ### Tag: v1.0.8
-**Date:** 2025-30-03
+**Date:** 2025-02-04
 **Description:**
--
+- Upgrade espressif32@6.10.0
+- Implemented DeviceConfig settings from NVM
+- Cleanup settings heap stack
+- Optimize CryptoHandler
+- Unstable need to revert to (v1.0.7)
+
+### Tag: v1.0.9
+**Date:** 2025-02-04
+**Description:**
+- Revert to v1.0.7
+- Implemented PrintFile
