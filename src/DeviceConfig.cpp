@@ -29,14 +29,14 @@ DeviceConfig::DeviceConfig() {
     strcpy(wifiPassword, SECURE_WIFI_PASSWORD);
     wifiScan = true;
 
-    mqttEnabled = false;
+    mqttEnabled = true; // Enable MQTT by default
     strcpy(mqttServer, SECURE_MQTT_SERVER);
     mqttPort = SECURE_MQTT_PORT;
-    mqttSsl = false;
+    mqttSsl = SECURE_MQTT_SSL;
     strcpy(mqttUsername, SECURE_MQTT_USERNAME);
     strcpy(mqttPassword, SECURE_MQTT_PASSWORD);
-    strcpy(mqttSubTopic, "device/in");
-    strcpy(mqttPubTopic, "device/out");
+    strcpy(mqttSubTopic, "passtxt/in");
+    strcpy(mqttPubTopic, "passtxt/out");
     mqttIsConnected = false;
 
     strcpy(securityApiKey, "abcdef123456");
@@ -165,8 +165,15 @@ uint64_t DeviceConfig::getDeviceBootCount() const { return deviceBootCount; }
 void DeviceConfig::setDeviceBootCount(uint64_t count) { deviceBootCount = count; saveToNVS(); }
 uint64_t DeviceConfig::getDeviceBootTime() const { return deviceBootTime; }
 void DeviceConfig::setDeviceBootTime(uint64_t time) { deviceBootTime = time; saveToNVS(); }
+
 uint64_t DeviceConfig::getDeviceUpTime() const { return deviceUpTime; }
-void DeviceConfig::setDeviceUpTime(uint64_t time) { deviceUpTime = time; saveToNVS(); }
+void DeviceConfig::setDeviceUpTime(uint64_t time) 
+{ 
+  deviceUpTime = time;
+  //Reduce writes to NVS to avoid wear and tear
+  //saveToNVS(); 
+}
+
 const char* DeviceConfig::getDeviceUserName() const { return deviceUserName; }
 void DeviceConfig::setDeviceUserName(const char* name) { strncpy(deviceUserName, name, sizeof(deviceUserName) - 1); deviceUserName[sizeof(deviceUserName) - 1] = '\0'; saveToNVS(); }
 const char* DeviceConfig::getDeviceUserPassword() const { return deviceUserPassword; }
@@ -205,8 +212,14 @@ const char* DeviceConfig::getMqttSubTopic() const { return mqttSubTopic; }
 void DeviceConfig::setMqttSubTopic(const char* topic) { strncpy(mqttSubTopic, topic, sizeof(mqttSubTopic) - 1); mqttSubTopic[sizeof(mqttSubTopic) - 1] = '\0'; saveToNVS(); }
 const char* DeviceConfig::getMqttPubTopic() const { return mqttPubTopic; }
 void DeviceConfig::setMqttPubTopic(const char* topic) { strncpy(mqttPubTopic, topic, sizeof(mqttPubTopic) - 1); mqttPubTopic[sizeof(mqttPubTopic) - 1] = '\0'; saveToNVS(); }
+
 bool DeviceConfig::getMqttIsConnected() const { return mqttIsConnected; }
-void DeviceConfig::setMqttIsConnected(bool connected) { mqttIsConnected = connected; saveToNVS(); }
+void DeviceConfig::setMqttIsConnected(bool connected) 
+{ 
+    mqttIsConnected = connected;
+    // Reduce the frequency of saving to NVS to avoid excessive writes
+    //saveToNVS(); 
+}
 
 // Security settings getters and setters
 const char* DeviceConfig::getSecurityApiKey() const { return securityApiKey; }
