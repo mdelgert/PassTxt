@@ -66,3 +66,4 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Description:**
 - Upgrade espressif32@6.10.0
 - Cleanup settings heap stack
+- Optimiaze CryptoHandler

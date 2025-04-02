@@ -1,5 +1,6 @@
 ## Active
 - [] Cleanup ConfigManager to SettingsHandler
+- [] Cleanup CryptoHandler
 
 ### Bugs
 - [] Current implementation over uses heap
