@@ -7,6 +7,7 @@
 #include "ImageSettings.h"
 #include "ImageWifi.h"
 #include "ImageWifiOff.h"
+#include "LedHandler.h"
 
 // Initialize the static member
 LGFX_LiLyGo_TDongleS3 GfxHandler::tft;
@@ -116,6 +117,24 @@ void GfxHandler::registerCommands()
             printMessage(args.c_str());
         }
 
+        if (cmd == "identify") {
+            // Print device name
+            printMessage(settings.device.name.c_str());
+
+            // Reboot due to heap stack overflow !!!!!!!!!!!!!
+            LedHandler::setColorByName("blue");
+            delay(1000);
+            LedHandler::setColorByName("black");
+            delay(1000);
+            LedHandler::setColorByName("blue");
+            delay(1000);
+            LedHandler::setColorByName("black");
+            delay(1000);
+            LedHandler::setColorByName("blue");
+            delay(1000);
+            LedHandler::setColorByName("black");
+        }
+
         else if (cmd == "clock") {
             bool state = args.equalsIgnoreCase("true");
             toggleClock(state);
@@ -180,6 +199,7 @@ void GfxHandler::registerCommands()
         } }, "Handles tft commands. Usage: led <subcommand> [args]\n"
                                          "  Subcommands:\n"
                                          "  print <print> - Print a message to TFT screen\n"
+                                         "  identify - Print device name\n"
                                          "  clock <true|false> - Show or hide current time on tft screen\n"
                                          "  demo - Show demo lock image on tft screen");
 }
