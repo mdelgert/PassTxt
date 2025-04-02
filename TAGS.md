@@ -75,3 +75,9 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 **Description:**
 - Revert to v1.0.7
 - Implemented PrintFile
+
+### Tag: v1.0.10
+**Date:** 2025-??-04
+**Description:**
+- Upgrade espressif32@6.10.0
+-
