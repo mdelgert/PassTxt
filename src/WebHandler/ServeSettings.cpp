@@ -8,11 +8,112 @@
 
 void ServeSettings::registerEndpoints(AsyncWebServer &server)
 {
-    server.on("/settings/get", HTTP_GET, handleGetSettings);
-    server.on("/settings/set", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, handleSetSettings);
+    handleGetSettings(server);
+    handleSetSettings(server);
+    server.on("/settings/deprecated/get", HTTP_GET, handleGetSettingsDeprecated);
+    server.on("/settings/deprecated/set", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, handleSetSettingsDeprecated);
 }
 
-void ServeSettings::handleGetSettings(AsyncWebServerRequest *request)
+void ServeSettings::handleGetSettings(AsyncWebServer &server)
+{
+    server.on("/settings/get", HTTP_GET, [](AsyncWebServerRequest *request){
+        
+        debugV("Received GET request on /settings/get");
+
+        JsonDocument doc;
+
+        // Device
+        doc["device"]["name"]             = deviceConfig.getDeviceName();
+        doc["device"]["timezone"]         = deviceConfig.getDeviceTimezone();
+        doc["device"]["bootCommand"]      = deviceConfig.getDeviceBootCommand();
+        doc["device"]["singlePress"]      = deviceConfig.getDeviceSinglePress();
+        doc["device"]["doublePress"]      = deviceConfig.getDeviceDoublePress();
+        doc["device"]["longPress"]        = deviceConfig.getDeviceLongPress();
+        doc["device"]["userName"]         = deviceConfig.getDeviceUserName();
+        doc["device"]["userPassword"]     = deviceConfig.getDeviceUserPassword();
+
+        // WiFi
+        doc["wifi"]["ssid"]               = deviceConfig.getWifiSsid();
+        doc["wifi"]["password"]           = deviceConfig.getWifiPassword();
+        doc["wifi"]["scan"]               = deviceConfig.getWifiScan();
+
+        // MQTT
+        doc["mqtt"]["enabled"]            = deviceConfig.getMqttEnabled();
+        doc["mqtt"]["server"]             = deviceConfig.getMqttServer();
+        doc["mqtt"]["port"]               = deviceConfig.getMqttPort();
+        doc["mqtt"]["username"]           = deviceConfig.getMqttUsername();
+        doc["mqtt"]["password"]           = deviceConfig.getMqttPassword();
+        doc["mqtt"]["ssl"]                = deviceConfig.getMqttSsl();
+        doc["mqtt"]["subTopic"]           = deviceConfig.getMqttSubTopic();
+        doc["mqtt"]["pubTopic"]           = deviceConfig.getMqttPubTopic();
+
+        // Security
+        doc["security"]["apiKey"]         = deviceConfig.getSecurityApiKey();
+
+        String responseBody;
+        serializeJson(doc, responseBody);
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", responseBody);
+        WebHandler::addCorsHeaders(response);
+        request->send(response);
+    });
+}
+
+void ServeSettings::handleSetSettings(AsyncWebServer &server)
+{
+    server.on("/settings/set", HTTP_POST, [](AsyncWebServerRequest *request) {}, nullptr,
+        [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+            debugV("Received POST request on /settings/archieve/set");
+
+            WebHandler::printRequestBody(request, data, len);
+
+            JsonDocument doc;
+            DeserializationError error = deserializeJson(doc, data, len);
+
+            if (error) {
+                debugE("JSON deserialization failed: %s", error.c_str());
+                WebHandler::sendErrorResponse(request, 400, "Invalid JSON payload");
+                return;
+            }
+
+            // Device
+            deviceConfig.setDeviceName(doc["device"]["name"]);
+            deviceConfig.setDeviceTimezone(doc["device"]["timezone"]);
+            deviceConfig.setDeviceBootCommand(doc["device"]["bootCommand"]);
+            deviceConfig.setDeviceSinglePress(doc["device"]["singlePress"]);
+            deviceConfig.setDeviceDoublePress(doc["device"]["doublePress"]);
+            deviceConfig.setDeviceLongPress(doc["device"]["longPress"]);
+            deviceConfig.setDeviceUserName(doc["device"]["userName"]);
+            deviceConfig.setDeviceUserPassword(doc["device"]["userPassword"]);
+            
+            // WiFi
+            deviceConfig.setWifiSsid(doc["wifi"]["ssid"]);
+            deviceConfig.setWifiPassword(doc["wifi"]["password"]);
+            deviceConfig.setWifiScan(doc["wifi"]["scan"]);
+
+            // MQTT
+            deviceConfig.setMqttEnabled(doc["mqtt"]["enabled"]);
+            deviceConfig.setMqttServer(doc["mqtt"]["server"]);
+            deviceConfig.setMqttPort(doc["mqtt"]["port"]);
+            deviceConfig.setMqttUsername(doc["mqtt"]["username"]);
+            deviceConfig.setMqttPassword(doc["mqtt"]["password"]);
+            deviceConfig.setMqttSsl(doc["mqtt"]["ssl"]);
+            deviceConfig.setMqttSubTopic(doc["mqtt"]["subTopic"]);
+            deviceConfig.setMqttPubTopic(doc["mqtt"]["pubTopic"]);
+            
+            // Security
+            deviceConfig.setSecurityApiKey(doc["security"]["apiKey"]);
+            
+            WebHandler::sendSuccessResponse(request, "Settings updated successfully");
+
+            // Optional reboot if needed
+            // if (delayTimer.isReady()) {
+            //     ESP.restart();
+            // }
+        }
+    );
+}
+
+void ServeSettings::handleGetSettingsDeprecated(AsyncWebServerRequest *request)
 {
     // Open the file for reading
     File file = LittleFS.open(SETTINGS_FILE, "r");
@@ -29,9 +130,9 @@ void ServeSettings::handleGetSettings(AsyncWebServerRequest *request)
     request->send(response);
 }
 
-void ServeSettings::handleSetSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+void ServeSettings::handleSetSettingsDeprecated(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
 {
-    debugV("Received POST request on /settings/set");
+    debugV("Received POST request on /settings/deprecated/set");
 
     // Accumulate incoming data
     static String requestBody;
@@ -95,9 +196,6 @@ void ServeSettings::handleSetSettings(AsyncWebServerRequest *request, uint8_t *d
 }
 
 /*
-//handleGetSettingsArchieve(server);
-//handleSetSettingsArchieve(server);
-
 void ServeSettings::handleSetSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
 {
     debugV("Received POST request on /settings/set");
@@ -257,110 +355,6 @@ void ServeSettings::handleSetSettings(AsyncWebServerRequest *request, uint8_t *d
     WebHandler::sendSuccessResponse(request, "Settings updated successfully");
 }
 
-void ServeSettings::handleGetSettingsArchieve(AsyncWebServer &server)
-{
-    server.on("/settings/archieve/get", HTTP_GET, [](AsyncWebServerRequest *request){
-        debugV("Received GET request on /settings/archieve/get");
-
-        JsonDocument doc;
-
-        // Device
-        doc["device_name"]       = settings.device.name;
-        doc["time_zone"]         = settings.device.timezone;
-        doc["setup_mode"]        = settings.device.setupMode;
-        doc["default_timeout"]   = settings.device.defaultTimeout;
-        doc["boot_count"]        = settings.device.bootCount;
-        doc["boot_time"]         = settings.device.bootTime;
-
-        // WiFi
-        doc["wifi_ssid"]         = settings.wifi.ssid;
-        doc["wifi_password"]     = settings.wifi.password;
-        doc["wifi_scan"]         = settings.wifi.scan;
-
-        // MQTT
-        doc["mqtt_enabled"]      = settings.mqtt.enabled;
-        doc["mqtt_server"]       = settings.mqtt.server;
-        doc["mqtt_port"]         = settings.mqtt.port;
-        doc["mqtt_username"]     = settings.mqtt.username;
-        doc["mqtt_password"]     = settings.mqtt.password;
-        doc["mqtt_ssl"]          = settings.mqtt.ssl;
-        doc["mqtt_topic_sub"]    = settings.mqtt.subTopic;
-        doc["mqtt_topic_pub"]    = settings.mqtt.pubTopic;
-
-        // Security
-        doc["api_key"]           = settings.security.apiKey;
-        doc["api_token"]         = settings.security.apiToken;
-        doc["ota_password"]      = settings.security.otaPassword;
-
-        // Features
-        doc["cors"]              = settings.features.cors;
-        doc["web_handler"]       = settings.features.webHandler;
-
-        WebHandler::sendSuccessResponse(request, "Settings retrieved successfully", &doc);
-    });
-}
-
-void ServeSettings::handleSetSettingsArchieve(AsyncWebServer &server)
-{
-    server.on("/settings/archieve/set", HTTP_POST, [](AsyncWebServerRequest *request) {}, nullptr,
-        [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
-            debugV("Received POST request on /settings/archieve/set");
-
-            WebHandler::printRequestBody(request, data, len);
-
-            JsonDocument doc;
-            DeserializationError error = deserializeJson(doc, data, len);
-
-            if (error) {
-                debugE("JSON deserialization failed: %s", error.c_str());
-                WebHandler::sendErrorResponse(request, 400, "Invalid JSON payload");
-                return;
-            }
-
-            // Device
-            settings.device.name         = doc["device_name"] | settings.device.name;
-            settings.device.timezone     = doc["time_zone"] | settings.device.timezone;
-            settings.device.setupMode    = doc["setup_mode"] | settings.device.setupMode;
-            settings.device.defaultTimeout = doc["default_timeout"] | settings.device.defaultTimeout;
-            settings.device.bootCount    = doc["boot_count"] | settings.device.bootCount;
-            settings.device.bootTime     = doc["boot_time"] | settings.device.bootTime;
-
-            // WiFi
-            settings.wifi.ssid           = doc["wifi_ssid"] | settings.wifi.ssid;
-            settings.wifi.password       = doc["wifi_password"] | settings.wifi.password;
-            settings.wifi.scan           = doc["wifi_scan"] | settings.wifi.scan;
-
-            // MQTT
-            settings.mqtt.enabled        = doc["mqtt_enabled"] | settings.mqtt.enabled;
-            settings.mqtt.server         = doc["mqtt_server"] | settings.mqtt.server;
-            settings.mqtt.port           = doc["mqtt_port"] | settings.mqtt.port;
-            settings.mqtt.ssl            = doc["mqtt_ssl"] | settings.mqtt.ssl;
-            settings.mqtt.username       = doc["mqtt_username"] | settings.mqtt.username;
-            settings.mqtt.password       = doc["mqtt_password"] | settings.mqtt.password;
-            settings.mqtt.subTopic       = doc["mqtt_topic_sub"] | settings.mqtt.subTopic;
-            settings.mqtt.pubTopic       = doc["mqtt_topic_pub"] | settings.mqtt.pubTopic;
-
-            // Security
-            settings.security.apiKey     = doc["api_key"] | settings.security.apiKey;
-            settings.security.apiToken   = doc["api_token"] | settings.security.apiToken;
-            settings.security.otaPassword = doc["ota_password"] | settings.security.otaPassword;
-
-            // Features
-            settings.features.cors       = doc["cors"] | settings.features.cors;
-            settings.features.webHandler = doc["web_handler"] | settings.features.webHandler;
-
-            // Save updated settings
-            ConfigManager::save();
-
-            WebHandler::sendSuccessResponse(request, "Settings updated successfully");
-
-            // Optional reboot if needed
-            // if (delayTimer.isReady()) {
-            //     ESP.restart();
-            // }
-        }
-    );
-}
 */
 
 #endif // ENABLE_WEB_HANDLER

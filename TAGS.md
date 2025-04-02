@@ -62,8 +62,14 @@ git push origin --delete v1.0.X # Delete the tag from the remote
 - Add samples
 
 ### Tag: v1.0.8
-**Date:** 2025-30-03
+**Date:** 2025-02-04
 **Description:**
 - Upgrade espressif32@6.10.0
 - Cleanup settings heap stack
-- Optimiaze CryptoHandler
+- Optimize CryptoHandler
+- Unstable need to revert to (v1.0.7)
+
+### Tag: v1.0.9
+**Date:** 2025-02-04
+**Description:**
+- Revert to v1.0.7

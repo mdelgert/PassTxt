@@ -1,4 +1,4 @@
-@baseUrl = http://demo1.local
+@baseUrl = http://passtxt5.local
 @token = test
 
 ### Get settings
@@ -61,6 +61,18 @@ Content-Type: application/json
     },
     "security": {
       "apiKey": "abcdef1234567"
+    }
+}
+###
+
+### Set settings2
+POST {{baseUrl}}/settings/set
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "device": {
+      "longPress": "test"
     }
 }
 ###
