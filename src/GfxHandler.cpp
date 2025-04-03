@@ -120,19 +120,11 @@ void GfxHandler::registerCommands()
         if (cmd == "identify") {
             // Print device name
             printMessage(settings.device.name.c_str());
-
+            
             // Reboot due to heap stack overflow !!!!!!!!!!!!!
             LedHandler::setColorByName("blue");
-            delay(1000);
-            LedHandler::setColorByName("black");
-            delay(1000);
-            LedHandler::setColorByName("blue");
-            delay(1000);
-            LedHandler::setColorByName("black");
-            delay(1000);
-            LedHandler::setColorByName("blue");
-            delay(1000);
-            LedHandler::setColorByName("black");
+            //delay(30000);
+            //LedHandler::setColorByName("black");
         }
 
         else if (cmd == "clock") {
